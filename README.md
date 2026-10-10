@@ -67,7 +67,8 @@ Expected output (measured on this machine):
 
 See [`docs/PROTOCOL.md`](docs/PROTOCOL.md) for the wire spec,
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for module design,
-[`docs/EVALUATION.md`](docs/EVALUATION.md) for numbers and threat model.
+[`docs/EVALUATION.md`](docs/EVALUATION.md) for numbers and threat model,
+[`paper/bluesky/main.pdf`](paper/bluesky/main.pdf) for the Blue Sky draft.
 
 1. **HELLO** `A→B`: `{agent_id, did:key:ephemeral, codecs, modes, nonce, ts}` (plaintext)
 2. **WELCOME** `B→A`: same + `selected` codec (negotiation; legacy peers offering no
