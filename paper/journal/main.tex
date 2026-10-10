@@ -28,7 +28,7 @@ agents that share nothing but a bare audio channel: a three-phase handshake
 CBOR task encoding, ChaCha20-Poly1305 authenticated messaging, an optional
 stop-and-wait ARQ layer for lossy acoustics, and a human-readable sidecar audit
 log. An open prototype ($\sim$900 lines of Python) demonstrates a hotel-booking
-dialogue end to end: 134--148\,B task frames, blocked spoof/replay/downgrade
+dialogue end to end: 117--139\,B task frames across two domains, blocked spoof/replay/downgrade
 attacks, 100\% pairing success on clean channels, 95--100\% under bursty
 VoIP-like loss where raw frames score 0\%, and immediate cost breakeven that
 widens to $\sim$65$\times$ at 20 turns. We state precisely what is measured,
@@ -137,7 +137,8 @@ forward secrecy per pairing). \textbf{Messaging.} TASK/RESULT carry
 \texttt{ChaCha(cbor(\{intent,slots,ontology,ts\}))} with the sender as AAD;
 replays are rejected by sequence plus (nonce, ciphertext) sets.
 \textbf{Compact encoding.} Hotel-ontology shorts (\texttt{hotel.book}$\to$\texttt{hb},
-\texttt{date}$\to$\texttt{d}, \dots) cut task frames 182/202\,B $\to$ 134/148\,B;
+\texttt{date}$\to$\texttt{d}, \dots) cut task frames 182/202\,B $\to$ 117--139\,B
+across hotel and taxi domains (non-default ontology tagged, value shorts);
 legacy full-form still decodes. \textbf{ARQ (optional).} Stop-and-wait layer:
 $\leq$110\,B CRC32 chunks (each fits one audible frame) with ACKs and bounded
 retries, tick-driven and deterministic. \textbf{Audit.} Every frame is appended
@@ -177,7 +178,8 @@ documented seeds.
 \section{Evaluation}
 \emph{Functionality.} Full pairing plus a two-intent booking dialogue runs end
 to end; measured sizes: handshake 609\,B one-time, HELLO $\sim$194\,B,
-KEY $\sim$107--113\,B, TASK 134/148\,B compact, RESULT 126--139\,B.
+KEY $\sim$107--113\,B, all four TASK frames 117--139\,B compact (hotel and
+taxi domains), RESULT 126--139\,B.
 
 \emph{Attacks (Table~\ref{tab:threat}).} A keyless attacker is rejected
 (\texttt{InvalidTag}); exact replays are rejected (sequence reuse); legacy
@@ -248,7 +250,9 @@ raw-text-over-tones (structure plus auth tags), shown, not hidden.
 (1) No over-air validation yet --- all loss models are byte-level; real
 Opus/G.711 traces and room measurements are the next experiment. (2) Identity
 is ephemeral, not PKI-backed; upgrading the HELLO to verifiable credentials
-(where IP exists) is designed but unbuilt. (3) Two-party only; MLS-style groups
+(where IP exists) is designed but unbuilt. Hand dictionaries are demo-scale;
+schema-driven dictionaries negotiated in HELLO are the scalable compression
+story and remain future work. (3) Two-party only; MLS-style groups
 are future work. (4) Auditing stops at readability; selective disclosure
 without workflow-graph leakage~\cite{graphmeta} is open. We invite red-teamers:
 the artifact reproduces every table from one command each (see

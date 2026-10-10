@@ -58,8 +58,8 @@ Expected output (measured on this machine):
 ```
 === ACT 2: 'you're AI? switch to SAPHIR' ===
   handshake done: ESTABLISHED both sides (X25519 + ChaCha)
-  [beep 182B] TASK hotel.check {...}
-  [beep 202B] TASK hotel.book {...}
+  [beep 117B] TASK hotel.check {...}
+  [beep 131B] TASK hotel.book {...}
 === ACT 3: attacker without keys tries to hijack ===
   BLOCKED forgery as designed: InvalidTag
   BLOCKED replay as designed: replay: seq 4 reused
@@ -83,8 +83,8 @@ See [`docs/PROTOCOL.md`](docs/PROTOCOL.md) for the wire spec,
 5. **Sidecar**: every frame appended to JSONL with human summary + decrypted view
 
 Frame: `u32be len ‖ CBOR({v, type, seq, sender, nonce, payload})`, cap 200B.
-Measured: HELLO ~194B, KEY ~107-113B, TASK ~180-202B, RESULT ~126-139B
-(≈1–2 ggwave audible transmissions per message).
+Measured: HELLO ~194B, KEY ~107-113B, TASK ~117-139B (hotel + taxi), RESULT ~126-139B
+(all task frames fit one ggwave audible transmission; handshake takes two).
 
 ## Security properties (MVP)
 

@@ -11,6 +11,7 @@ from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink,
                       BurstChannel, ChannelProfile, PROFILES)
 from .audit import AuditLog
 from .agents import CallerAgent, ReceptionistAgent, run_booking_dialogue
+from .agents import TaxiDispatch, TAXI_TASKS, TAXI_FLEET
 
 __version__ = "0.1.0"
 __all__ = [
@@ -23,4 +24,5 @@ __all__ = [
     "ReliableLink", "LinkStats",
     "BurstChannel", "ChannelProfile", "PROFILES",
     "AuditLog", "CallerAgent", "ReceptionistAgent", "run_booking_dialogue",
+    "TaxiDispatch", "TAXI_TASKS", "TAXI_FLEET",
 ]

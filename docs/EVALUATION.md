@@ -17,7 +17,8 @@ PYTHONPATH=src python evals/attacks.py
 | English dialogue | 214 chars (~54 tokens) |
 | SAPHIR handshake (one-time) | 609 B |
 | SAPHIR tasks (2 intents + 2 results, compact encoding) | 528 B (tasks alone 282 B) |
-| TASK hotel.check / hotel.book wire size | 134 B / 148 B (was 182/202 B full-form) |
+| TASK hotel.check / hotel.book wire size | 117 B / 131 B (was 182/202 B full-form) |
+| TASK taxi.request / taxi.book wire size | 128 B / 139 B (non-default ontology) |
 | Speech-loop wall time (model) | ~20.1 s |
 | SAPHIR wall time @32 Bps (model) | ~10.4 s (tasks) / ~18 s (incl. handshake) |
 
@@ -124,3 +125,12 @@ Reading: ARQ holds ≥95% through bursty VoIP-like conditions at zero retry cost
 in the median; the harsh narrowband profile degrades to 80% via retry
 exhaustion, bounding the current design's operating envelope. Repro:
 `PYTHONPATH=src:evals python evals/codec_profiles.py`.
+
+## 8. Generality: second domain (taxi dispatch)
+
+`TaxiDispatch` + `TAXI_TASKS` (`taxi.request`/`taxi.book` with fare/ETA) run the
+same seal/open/handle path with a non-default ontology tag (`st1`) and
+domain-specific value shorts. All four task frames across both domains fit the
+single-frame budget (117/131/128/139 B). Test: `tests/test_domains.py`.
+Dictionary coding is demo-scale by design; schema-driven dictionaries
+negotiated in HELLO are the scalable version (manuscript RQ).

@@ -26,12 +26,18 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 | HELLO | ~194 | largest; shrink path: 8B nonce, shorter DID |
 | WELCOME | ~195 | echo + selected codec |
 | KEY1 / KEY2 | ~107 / 113 | 32B pubkey + envelope |
-| TASK hotel.check | ~134 | encrypted, compact encoding — fits single frame |
-| TASK hotel.book | ~148 | encrypted, compact — borderline, needs short-name value or 2 frames |
+| TASK hotel.check | ~117 | encrypted, compact encoding — fits single frame |
+| TASK hotel.book | ~131 | encrypted, compact — fits single frame |
+| TASK taxi.request / taxi.book | ~128 / 139 | non-default ontology (`st1` tag), fits single frame |
 | RESULT | ~126–139 | encrypted |
 
-Shrinking below 140B single-frame for all messages is open work (short keys,
-array-form CBOR, slot dictionary). The cap is enforced in `encode_envelope()`.
+Shrinking below 140B single-frame for all messages is done for tasks via
+dictionary coding (slot shorts, value shorts for rooms/locations/dates,
+omitted default ontology, second-resolution timestamps). Handshake frames
+(HELLO/WELCOME ~194B) still need two transmissions; sub-140B handshake
+compaction is open work. Hand dictionaries are demo-scale by design;
+schema-driven dictionaries negotiated in HELLO are the scalable version
+(future work, listed as an RQ in the manuscript).
 
 ## Security properties (MVP)
 

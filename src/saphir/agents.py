@@ -66,3 +66,41 @@ def run_booking_dialogue():
     import json
     st = sum(len(json.dumps(t)) for t in STRUCTURED_TASKS)
     return eng, st
+
+
+# ---- Second domain: taxi dispatch (proves the ontology/encoding generalizes) ----
+TAXI_FLEET = {
+    ("RVCE", "Majestic"): {"fare": 250, "eta_min": 15, "cars": 4},
+    ("RVCE", "Airport"): {"fare": 900, "eta_min": 40, "cars": 2},
+}
+
+TAXI_TASKS = [
+    {"intent": "taxi.request", "slots": {"from": "RVCE", "to": "Majestic",
+                                         "seats": 2, "time": "18:00"},
+     "ontology": "saphir-taxi-v1"},
+    {"intent": "taxi.book", "slots": {"from": "RVCE", "to": "Majestic",
+                                      "seats": 2, "time": "18:00", "name": "Vaibhav"},
+     "ontology": "saphir-taxi-v1"},
+]
+
+
+@dataclass
+class TaxiDispatch:
+    name: str = "dispatch"
+    fleet: dict = field(default_factory=lambda: {k: dict(v) for k, v in TAXI_FLEET.items()})
+
+    def handle_task(self, task: dict) -> dict:
+        intent, slots = task.get("intent"), task.get("slots", {})
+        key = (slots.get("from"), slots.get("to"))
+        car = self.fleet.get(key)
+        if intent == "taxi.request":
+            if car and car["cars"] > 0:
+                return {"ok": True, "fare": car["fare"], "eta_min": car["eta_min"]}
+            return {"ok": False, "error": "no cars"}
+        if intent == "taxi.book":
+            if car and car["cars"] > 0:
+                car["cars"] -= 1
+                return {"ok": True, "confirmation": "TX-2026-0713",
+                        "fare": car["fare"], "eta_min": car["eta_min"]}
+            return {"ok": False, "error": "no cars"}
+        return {"ok": False, "error": f"unknown intent {intent}"}
