@@ -80,3 +80,28 @@ Headline comparison: at (0.000, 0.005) and (0.050, 0.005) raw frames score
 measured retry cost (~1.6× wire bytes). Residual failures at 10% loss are retry
 exhaustion (bounded budget), not integrity failures. Repro:
 `PYTHONPATH=src python evals/reliability.py`.
+
+## 6. Amortization (measured bytes, modeled cost/time; `evals/amortization.py`)
+
+One 609B handshake (measured), then rotating check/book turns (mean 263B wire
+per TASK+RESULT pair, measured). English baseline: 53.5 chars/turn (measured
+from the dialogue script) sent as raw text-over-tones + full STT→LLM→TTS per
+turn (modeled in `metrics.py`). SAPHIR turns cost nominal CPU only (stated
+$2e-5/turn assumption). Time at reference 32 Bps goodput — rescale linearly
+for other ggwave profiles; bytes are the hard numbers.
+
+| turns | eng wire B | saphir wire B | eng cost $ | saphir cost $ | eng sec | saphir sec |
+|---|---|---|---|---|---|---|
+| 1 | 54 | 860 | 0.0013 | 0.00002 | 5.0 | 27.3 |
+| 2 | 108 | 1137 | 0.0027 | 0.00004 | 10.0 | 36.3 |
+| 4 | 216 | 1661 | 0.0053 | 0.00008 | 20.1 | 53.5 |
+| 8 | 432 | 2713 | 0.0107 | 0.00016 | 40.2 | 88.0 |
+| 20 | 1080 | 5869 | 0.0266 | 0.00040 | 100.4 | 191.4 |
+
+Reading for the paper: **cost breakeven is immediate and grows (~65× at 20
+turns)** — that, plus determinism and security, is the claimed win.
+**Wall-clock is deliberately not claimed**: narrowband audio moves fewer
+bytes/sec than speech, so SAPHIR trades time for near-zero neural compute.
+Wire bytes stay above raw-text-over-tones (structure + auth tags cost);
+Figure `paper/figures/amortization.png` plots both panels side by side.
+Repro: `PYTHONPATH=src python evals/amortization.py` (writes CSV + figure).

@@ -49,6 +49,7 @@ PYTHONPATH=src python evals/bench.py
 PYTHONPATH=src python evals/attacks.py
 PYTHONPATH=src python evals/robustness.py
 PYTHONPATH=src python evals/reliability.py   # ARQ vs raw comparison
+PYTHONPATH=src python evals/amortization.py  # cost/time/bytes vs turns + figure
 ```
 
 Expected output (measured on this machine):

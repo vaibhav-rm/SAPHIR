@@ -19,7 +19,7 @@ Constraint: **no conference travel.** So the path is journal + preprint, not ven
 - [x] Attack matrix (replay/forgery/downgrade)
 - [x] Raw-channel robustness sweep
 - [x] Reliability framing (ACK/retry) + re-sweep showing the cliff fixed (`ReliableLink`, §5)
-- [ ] Amortization curve (handshake cost vs dialogue length)
+- [x] Amortization curve (handshake cost vs dialogue length; §6 + figure)
 - [ ] Over-air or high-fidelity codec simulation (Opus/G.711 traces, room noise)
 - [ ] Expanded related work (full survey table, not just the Blue Sky paragraph)
 - [ ] Reproducibility appendix (commands, seeds, artifact link)
