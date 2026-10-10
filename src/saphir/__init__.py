@@ -5,6 +5,7 @@ from .protocol import (
     build_hello, build_task, PROTOCOL_VERSION,
 )
 from .crypto import EphemeralKeypair, SessionKeys, derive_session_keys
+from .codec import compact_task, expand_task
 from .session import SaphirSession, SessionState, HandshakeError
 from .channel import InMemoryChannel, LossyChannel, ChannelStats
 from .audit import AuditLog
@@ -16,6 +17,7 @@ __all__ = [
     "encode_envelope", "decode_envelope", "build_hello", "build_task",
     "PROTOCOL_VERSION", "EphemeralKeypair", "SessionKeys", "derive_session_keys",
     "SaphirSession", "SessionState", "HandshakeError",
+    "compact_task", "expand_task",
     "InMemoryChannel", "LossyChannel", "ChannelStats",
     "AuditLog", "CallerAgent", "ReceptionistAgent", "run_booking_dialogue",
 ]

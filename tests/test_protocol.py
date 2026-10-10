@@ -25,7 +25,17 @@ def test_frame_sizes_fit_ggwave():
     a, b = _handshake()
     for intent, slots in [("hotel.check", {"date": "2026-11-02", "room": "double", "nights": 2}),
                           ("hotel.book", {"date": "2026-11-02", "room": "double", "nights": 2, "name": "V"})]:
-        assert len(encode_envelope(a.seal_task(intent, slots))) <= 200
+        assert len(encode_envelope(a.seal_task(intent, slots))) <= 140
+
+
+def test_compact_roundtrip_preserves_semantics():
+    a, b = _handshake()
+    slots = {"date": "2026-11-02", "room": "double", "nights": 2, "guests": 2, "name": "Vaibhav"}
+    t = a.seal_task("hotel.book", slots)
+    env, _ = decode_envelope(encode_envelope(t))
+    got = b.open_task(env)
+    assert got["intent"] == "hotel.book" and got["slots"] == slots
+    assert got["ontology"] == "saphir-hotel-v1"
 
 
 def test_version_rejected():

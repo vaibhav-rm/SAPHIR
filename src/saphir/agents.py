@@ -38,7 +38,7 @@ class CallerAgent:
 @dataclass
 class ReceptionistAgent:
     name: str = "receptionist"
-    inventory: dict = field(default_factory=lambda: dict(INVENTORY))
+    inventory: dict = field(default_factory=lambda: {k: dict(v) for k, v in INVENTORY.items()})
 
     def handle_task(self, task: dict) -> dict:
         intent, slots = task.get("intent"), task.get("slots", {})

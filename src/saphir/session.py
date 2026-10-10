@@ -102,7 +102,8 @@ class SaphirSession:
     def seal_task(self, intent: str, slots: dict, ontology: str = "saphir-hotel-v1") -> Envelope:
         if self.state != SessionState.ESTABLISHED or self.keys is None:
             raise HandshakeError("session not established")
-        pt = cbor2.dumps({"intent": intent, "slots": slots, "ontology": ontology, "ts": time.time()})
+        from .codec import compact_task
+        pt = cbor2.dumps(compact_task(intent, slots, ontology))
         nonce, ct = self.keys.seal(pt, aad=self.agent_id.encode())
         env = Envelope(type=MsgType.TASK, seq=self.seq, sender=self.agent_id,
                        nonce=nonce, payload=ct)
@@ -116,7 +117,8 @@ class SaphirSession:
             raise HandshakeError(f"replay: seq {env.seq} reused")
         self._seen_seq.add(env.seq)
         pt = self.keys.open(bytes(env.nonce), bytes(env.payload), aad=env.sender.encode())
-        return cbor2.loads(pt)
+        from .codec import expand_task
+        return expand_task(cbor2.loads(pt))
 
     def seal_result(self, result: dict) -> Envelope:
         if self.state != SessionState.ESTABLISHED or self.keys is None:

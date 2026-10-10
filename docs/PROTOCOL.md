@@ -26,8 +26,8 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 | HELLO | ~194 | largest; shrink path: 8B nonce, shorter DID |
 | WELCOME | ~195 | echo + selected codec |
 | KEY1 / KEY2 | ~107 / 113 | 32B pubkey + envelope |
-| TASK hotel.check | ~182 | encrypted |
-| TASK hotel.book | ~202 | encrypted, exceeds single ggwave tx → needs 2 frames |
+| TASK hotel.check | ~134 | encrypted, compact encoding — fits single frame |
+| TASK hotel.book | ~148 | encrypted, compact — borderline, needs short-name value or 2 frames |
 | RESULT | ~126–139 | encrypted |
 
 Shrinking below 140B single-frame for all messages is open work (short keys,

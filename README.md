@@ -43,10 +43,11 @@ pip install -r requirements.txt
 # 3-act demo: talk → switch → attack blocked
 PYTHONPATH=src python demo/demo_cli.py
 
-# tests / benchmark / attack checks
+# tests / benchmark / attacks / robustness sweep
 PYTHONPATH=src python -m pytest tests/ -q
 PYTHONPATH=src python evals/bench.py
 PYTHONPATH=src python evals/attacks.py
+PYTHONPATH=src python evals/robustness.py
 ```
 
 Expected output (measured on this machine):

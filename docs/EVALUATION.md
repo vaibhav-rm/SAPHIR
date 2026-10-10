@@ -16,9 +16,10 @@ PYTHONPATH=src python evals/attacks.py
 |---|---|
 | English dialogue | 214 chars (~54 tokens) |
 | SAPHIR handshake (one-time) | 609 B |
-| SAPHIR tasks (2 intents + 2 results) | 630 B (tasks alone 384 B) |
+| SAPHIR tasks (2 intents + 2 results, compact encoding) | 528 B (tasks alone 282 B) |
+| TASK hotel.check / hotel.book wire size | 134 B / 148 B (was 182/202 B full-form) |
 | Speech-loop wall time (model) | ~20.1 s |
-| SAPHIR wall time @32 Bps (model) | ~13.6 s (tasks) / ~41 s (incl. handshake) |
+| SAPHIR wall time @32 Bps (model) | ~10.4 s (tasks) / ~18 s (incl. handshake) |
 
 **Claim discipline:** raw bytes are currently *larger* than English chars
 (CBOR + 16B auth tags + envelope overhead). The saving is **neural compute**
@@ -41,7 +42,20 @@ Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 | Attacker *with* stolen session keys | n/a | ⚠️ out of scope (needs PKI rotation — future work) |
 | Traffic analysis (who talks) | n/a | ⚠️ out of scope (see Dangol 2026) |
 
-## 4. Robustness (next)
+## 4. Robustness (measured, `evals/robustness.py`, 50 trials/cell, no retransmission)
 
-`LossyChannel(drop_p, corrupt_p)` exists for codec/noise sweeps
-(PCM / Opus / G.711, 0–20 dB SNR). Sweep script + tables are weeks 5–6 work.
+| drop_p | corrupt_p | success | rate |
+|---|---|---|---|
+| 0.000 | 0.000 | 50/50 | 100% |
+| 0.010 | 0.000 | 47/50 | 94% |
+| 0.050 | 0.000 | 35/50 | 70% |
+| 0.100 | 0.000 | 22/50 | 44% |
+| 0.000 | 0.001 | 18/50 | 36% |
+| 0.000 | 0.005 | 0/50 | 0% |
+| 0.020 | 0.002 | 5/50 | 10% |
+| 0.050 | 0.005 | 0/50 | 0% |
+
+Reading: drops degrade gracefully (each of the ~8 frames must survive); corruption
+kills fast because AEAD rejects forged frames — integrity over availability, by design.
+v0.1 has no ACK/retry, so any dropped handshake frame fails the pairing. Reliability
+framing is the top next item before over-air claims. Repro: `PYTHONPATH=src python evals/robustness.py`.
