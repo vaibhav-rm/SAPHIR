@@ -7,7 +7,8 @@ from .protocol import (
 from .crypto import EphemeralKeypair, SessionKeys, derive_session_keys
 from .codec import compact_task, expand_task
 from .session import SaphirSession, SessionState, HandshakeError
-from .channel import InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats
+from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats,
+                      BurstChannel, ChannelProfile, PROFILES)
 from .audit import AuditLog
 from .agents import CallerAgent, ReceptionistAgent, run_booking_dialogue
 
@@ -20,5 +21,6 @@ __all__ = [
     "compact_task", "expand_task",
     "InMemoryChannel", "LossyChannel", "ChannelStats",
     "ReliableLink", "LinkStats",
+    "BurstChannel", "ChannelProfile", "PROFILES",
     "AuditLog", "CallerAgent", "ReceptionistAgent", "run_booking_dialogue",
 ]

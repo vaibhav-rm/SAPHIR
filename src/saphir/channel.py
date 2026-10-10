@@ -195,3 +195,66 @@ class ReliableLink:
 
     def quiet(self) -> bool:
         return not self._pending and not self.stats.failed
+
+
+@dataclass
+class ChannelProfile:
+    """Named loss model. These are *byte-level* models of channel conditions,
+    NOT waveform simulations: parameters are illustrative, and over-air
+    measurement across real codecs remains future work (see EVALUATION §7)."""
+    name: str
+    note: str
+    drop_p: float = 0.0
+    corrupt_p: float = 0.0
+    burst_p_gb: float = 0.0   # Good->Bad transition per chunk
+    burst_p_bg: float = 1.0   # Bad->Good transition per chunk
+    burst_corrupt_p: float = 0.0  # corruption prob while in Bad state
+
+
+PROFILES: dict[str, ChannelProfile] = {
+    "clean": ChannelProfile("clean", "wired / loopback reference"),
+    "cafe-noise": ChannelProfile("cafe-noise", "room noise, random loss",
+                                 drop_p=0.02, corrupt_p=0.002),
+    "opus-like": ChannelProfile("opus-like", "bursty VoIP artifacts",
+                                drop_p=0.01, burst_p_gb=0.03, burst_p_bg=0.4,
+                                burst_corrupt_p=0.25),
+    "pstn-harsh": ChannelProfile("pstn-harsh", "narrowband trunk, heavy bursts",
+                                 drop_p=0.05, burst_p_gb=0.05, burst_p_bg=0.3,
+                                 burst_corrupt_p=0.4),
+}
+
+
+class BurstChannel:
+    """Two-state (Gilbert-Elliott) burst-error channel wrapping a byte pipe."""
+
+    def __init__(self, inner: InMemoryChannel, profile: ChannelProfile, seed: int = 0):
+        self.inner = inner
+        self.profile = profile
+        self.rng = random.Random(seed)
+        self.bad = False
+        self.stats = ChannelStats()
+
+    def send(self, frame: bytes):
+        p = self.profile
+        r = self.rng.random()
+        self.bad = (r < p.burst_p_gb) if not self.bad else (r >= p.burst_p_bg)
+        if self.rng.random() < p.drop_p:
+            self.stats.frames_dropped += 1
+            return
+        f = bytearray(frame)
+        cp = p.corrupt_p + (p.burst_corrupt_p if self.bad else 0.0)
+        if cp > 0 and len(f) > 4 and self.rng.random() < cp:
+            f[4 + self.rng.randrange(len(f) - 4)] ^= 0xFF
+        self.inner.send(bytes(f))
+        self.stats.frames_sent += 1
+        self.stats.bytes_sent += len(frame)
+
+    def recv(self):
+        f = self.inner.recv()
+        if f is not None:
+            self.stats.frames_recv += 1
+            self.stats.bytes_recv += len(f)
+        return f
+
+    def pending(self):
+        return self.inner.pending()

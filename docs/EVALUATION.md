@@ -105,3 +105,22 @@ bytes/sec than speech, so SAPHIR trades time for near-zero neural compute.
 Wire bytes stay above raw-text-over-tones (structure + auth tags cost);
 Figure `paper/figures/amortization.png` plots both panels side by side.
 Repro: `PYTHONPATH=src python evals/amortization.py` (writes CSV + figure).
+
+## 7. Codec/noise profiles (byte-level models; `evals/codec_profiles.py`, 20 trials/cell)
+
+`BurstChannel` (Gilbert-Elliott two-state bursts) + named `PROFILES`, full task
+over ARQ. These are illustrative loss models, **not** waveform simulation —
+over-air measurement across real codecs (PCM/Opus/G.711) remains future work,
+and the manuscript must say so.
+
+| profile | success | rate | median ticks | median wire B | median retries |
+|---|---|---|---|---|---|
+| clean | 20/20 | 100% | 12 | 1572 | 0 |
+| cafe-noise | 19/20 | 95% | 12 | 1572 | 0 |
+| opus-like | 19/20 | 95% | 12 | 1572 | 0 |
+| pstn-harsh | 16/20 | 80% | 15 | 1725 | 2 |
+
+Reading: ARQ holds ≥95% through bursty VoIP-like conditions at zero retry cost
+in the median; the harsh narrowband profile degrades to 80% via retry
+exhaustion, bounding the current design's operating envelope. Repro:
+`PYTHONPATH=src:evals python evals/codec_profiles.py`.

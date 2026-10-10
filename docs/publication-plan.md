@@ -20,6 +20,6 @@ Constraint: **no conference travel.** So the path is journal + preprint, not ven
 - [x] Raw-channel robustness sweep
 - [x] Reliability framing (ACK/retry) + re-sweep showing the cliff fixed (`ReliableLink`, §5)
 - [x] Amortization curve (handshake cost vs dialogue length; §6 + figure)
-- [ ] Over-air or high-fidelity codec simulation (Opus/G.711 traces, room noise)
+- [x] Channel-profile simulation (burst models + sweep; §7 — waveform/over-air still future)
 - [ ] Expanded related work (full survey table, not just the Blue Sky paragraph)
 - [ ] Reproducibility appendix (commands, seeds, artifact link)

@@ -16,10 +16,13 @@ BUDGET = 120  # ticks per envelope step
 
 
 class Driver:
-    def __init__(self, drop_p: float, corrupt_p: float, seed: int):
+    def __init__(self, drop_p: float, corrupt_p: float, seed: int, factory=None):
         self.t = 0
-        ab = LossyChannel(InMemoryChannel(), drop_p, corrupt_p, seed=seed)
-        ba = LossyChannel(InMemoryChannel(), drop_p, corrupt_p, seed=seed + 10**6)
+        if factory is None:
+            ab = LossyChannel(InMemoryChannel(), drop_p, corrupt_p, seed=seed)
+            ba = LossyChannel(InMemoryChannel(), drop_p, corrupt_p, seed=seed + 10**6)
+        else:
+            ab, ba = factory(seed)
         self.la = ReliableLink(ab, ba)
         self.lb = ReliableLink(ba, ab)
 
@@ -50,9 +53,9 @@ class Driver:
         return self.la.stats.retries + self.lb.stats.retries
 
 
-def trial(drop_p: float, corrupt_p: float, seed: int):
+def trial(drop_p: float, corrupt_p: float, seed: int, factory=None):
     try:
-        d = Driver(drop_p, corrupt_p, seed)
+        d = Driver(drop_p, corrupt_p, seed, factory=factory)
         a, b = SaphirSession("caller"), SaphirSession("receptionist")
         recep = ReceptionistAgent()
         e = d.deliver(d.la, d.lb, a.hello())
