@@ -57,5 +57,26 @@ Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 
 Reading: drops degrade gracefully (each of the ~8 frames must survive); corruption
 kills fast because AEAD rejects forged frames — integrity over availability, by design.
-v0.1 has no ACK/retry, so any dropped handshake frame fails the pairing. Reliability
-framing is the top next item before over-air claims. Repro: `PYTHONPATH=src python evals/robustness.py`.
+Repro: `PYTHONPATH=src python evals/robustness.py`.
+
+## 5. Reliability framing (measured, `evals/reliability.py`, 20 trials/cell)
+
+Stop-and-wait ARQ (`ReliableLink`: ≤110B CRC32 chunks + ACKs, ≤10 retries) over the
+same grid. Ticks = link slots; wire bytes include chunk headers, ACKs, retries.
+
+| drop_p | corrupt_p | success | rate | median ticks | median wire B | median retries |
+|---|---|---|---|---|---|---|
+| 0.000 | 0.000 | 20/20 | 100% | 12 | 1572 | 0 |
+| 0.010 | 0.000 | 20/20 | 100% | 12 | 1572 | 0 |
+| 0.050 | 0.000 | 20/20 | 100% | 14 | 1572 | 1 |
+| 0.100 | 0.000 | 17/20 | 85% | 14 | 1627 | 3 |
+| 0.000 | 0.001 | 19/20 | 95% | 14 | 1699 | 1 |
+| 0.000 | 0.005 | 20/20 | 100% | 26 | 2523 | 8 |
+| 0.020 | 0.002 | 20/20 | 100% | 17 | 1834 | 3 |
+| 0.050 | 0.005 | 19/20 | 95% | 30 | 2589 | 12 |
+
+Headline comparison: at (0.000, 0.005) and (0.050, 0.005) raw frames score
+**0%** (§4) while ARQ scores **100% / 95%**, converting the corruption cliff into
+measured retry cost (~1.6× wire bytes). Residual failures at 10% loss are retry
+exhaustion (bounded budget), not integrity failures. Repro:
+`PYTHONPATH=src python evals/reliability.py`.

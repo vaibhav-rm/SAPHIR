@@ -48,6 +48,7 @@ PYTHONPATH=src python -m pytest tests/ -q
 PYTHONPATH=src python evals/bench.py
 PYTHONPATH=src python evals/attacks.py
 PYTHONPATH=src python evals/robustness.py
+PYTHONPATH=src python evals/reliability.py   # ARQ vs raw comparison
 ```
 
 Expected output (measured on this machine):
