@@ -16,18 +16,17 @@ PYTHONPATH=src python evals/attacks.py
 |---|---|
 | English dialogue | 214 chars (~54 tokens) |
 | SAPHIR handshake (one-time) | 609 B |
-| SAPHIR tasks (2 intents + 2 results, compact encoding) | 528 B (tasks alone 282 B) |
+| SAPHIR tasks (2 intents + 2 results, compact encoding) | 494 B (tasks alone 248 B) |
 | TASK hotel.check / hotel.book wire size | 117 B / 131 B (was 182/202 B full-form) |
 | TASK taxi.request / taxi.book wire size | 128 B / 139 B (non-default ontology) |
 | Speech-loop wall time (model) | ~20.1 s |
-| SAPHIR wall time @32 Bps (model) | ~10.4 s (tasks) / ~18 s (incl. handshake) |
+| SAPHIR wall time @32 Bps (model) | ~8.6 s (tasks) / ~17.0 s (incl. handshake) |
 
 **Claim discipline:** raw bytes are currently *larger* than English chars
 (CBOR + 16B auth tags + envelope overhead). The saving is **neural compute**
 (no TTS/STT/LLM forward passes per turn; tone decode is ms of CPU), not raw
-byte count. Handshake amortizes over longer dialogues. Byte-compaction
-(short slot keys, array-form CBOR) is scheduled work — do not claim byte
-savings in the paper until it lands.
+byte count. Byte-compaction for tasks has landed (all task frames single-frame,
+117--139 B); handshake frames (~194 B) still take two transmissions.
 
 Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 32 Bps audible-fast goodput). Tune and cite before submitting.
@@ -53,7 +52,7 @@ Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 | 0.100 | 0.000 | 22/50 | 44% |
 | 0.000 | 0.001 | 18/50 | 36% |
 | 0.000 | 0.005 | 0/50 | 0% |
-| 0.020 | 0.002 | 5/50 | 10% |
+| 0.020 | 0.002 | 4/50 | 8% |
 | 0.050 | 0.005 | 0/50 | 0% |
 
 Reading: drops degrade gracefully (each of the ~8 frames must survive); corruption
@@ -67,14 +66,14 @@ same grid. Ticks = link slots; wire bytes include chunk headers, ACKs, retries.
 
 | drop_p | corrupt_p | success | rate | median ticks | median wire B | median retries |
 |---|---|---|---|---|---|---|
-| 0.000 | 0.000 | 20/20 | 100% | 12 | 1572 | 0 |
-| 0.010 | 0.000 | 20/20 | 100% | 12 | 1572 | 0 |
-| 0.050 | 0.000 | 20/20 | 100% | 14 | 1572 | 1 |
-| 0.100 | 0.000 | 17/20 | 85% | 14 | 1627 | 3 |
-| 0.000 | 0.001 | 19/20 | 95% | 14 | 1699 | 1 |
-| 0.000 | 0.005 | 20/20 | 100% | 26 | 2523 | 8 |
-| 0.020 | 0.002 | 20/20 | 100% | 17 | 1834 | 3 |
-| 0.050 | 0.005 | 19/20 | 95% | 30 | 2589 | 12 |
+| 0.000 | 0.000 | 20/20 | 100% | 12 | 1538 | 0 |
+| 0.010 | 0.000 | 20/20 | 100% | 12 | 1538 | 0 |
+| 0.050 | 0.000 | 20/20 | 100% | 14 | 1538 | 1 |
+| 0.100 | 0.000 | 17/20 | 85% | 14 | 1576 | 3 |
+| 0.000 | 0.001 | 19/20 | 95% | 14 | 1665 | 1 |
+| 0.000 | 0.005 | 20/20 | 100% | 26 | 2552 | 8 |
+| 0.020 | 0.002 | 20/20 | 100% | 17 | 1800 | 3 |
+| 0.050 | 0.005 | 19/20 | 95% | 30 | 2539 | 12 |
 
 Headline comparison: at (0.000, 0.005) and (0.050, 0.005) raw frames score
 **0%** (§4) while ARQ scores **100% / 95%**, converting the corruption cliff into
@@ -84,7 +83,7 @@ exhaustion (bounded budget), not integrity failures. Repro:
 
 ## 6. Amortization (measured bytes, modeled cost/time; `evals/amortization.py`)
 
-One 609B handshake (measured), then rotating check/book turns (mean 263B wire
+One 609B handshake (measured), then rotating check/book turns (mean 246B wire
 per TASK+RESULT pair, measured). English baseline: 53.5 chars/turn (measured
 from the dialogue script) sent as raw text-over-tones + full STT→LLM→TTS per
 turn (modeled in `metrics.py`). SAPHIR turns cost nominal CPU only (stated
@@ -93,11 +92,11 @@ for other ggwave profiles; bytes are the hard numbers.
 
 | turns | eng wire B | saphir wire B | eng cost $ | saphir cost $ | eng sec | saphir sec |
 |---|---|---|---|---|---|---|
-| 1 | 54 | 860 | 0.0013 | 0.00002 | 5.0 | 27.3 |
-| 2 | 108 | 1137 | 0.0027 | 0.00004 | 10.0 | 36.3 |
-| 4 | 216 | 1661 | 0.0053 | 0.00008 | 20.1 | 53.5 |
-| 8 | 432 | 2713 | 0.0107 | 0.00016 | 40.2 | 88.0 |
-| 20 | 1080 | 5869 | 0.0266 | 0.00040 | 100.4 | 191.4 |
+| 1 | 54 | 843 | 0.0013 | 0.00002 | 5.0 | 26.7 |
+| 2 | 108 | 1103 | 0.0027 | 0.00004 | 10.0 | 35.3 |
+| 4 | 216 | 1593 | 0.0053 | 0.00008 | 20.1 | 51.4 |
+| 8 | 432 | 2577 | 0.0107 | 0.00016 | 40.2 | 83.7 |
+| 20 | 1080 | 5529 | 0.0266 | 0.00040 | 100.4 | 180.8 |
 
 Reading for the paper: **cost breakeven is immediate and grows (~65× at 20
 turns)** — that, plus determinism and security, is the claimed win.
@@ -116,10 +115,10 @@ and the manuscript must say so.
 
 | profile | success | rate | median ticks | median wire B | median retries |
 |---|---|---|---|---|---|
-| clean | 20/20 | 100% | 12 | 1572 | 0 |
-| cafe-noise | 19/20 | 95% | 12 | 1572 | 0 |
-| opus-like | 19/20 | 95% | 12 | 1572 | 0 |
-| pstn-harsh | 16/20 | 80% | 15 | 1725 | 2 |
+| clean | 20/20 | 100% | 12 | 1538 | 0 |
+| cafe-noise | 19/20 | 95% | 12 | 1538 | 0 |
+| opus-like | 19/20 | 95% | 12 | 1538 | 0 |
+| pstn-harsh | 16/20 | 80% | 15 | 1691 | 2 |
 
 Reading: ARQ holds ≥95% through bursty VoIP-like conditions at zero retry cost
 in the median; the harsh narrowband profile degrades to 80% via retry

@@ -106,7 +106,7 @@ InterSAGE & trust substrate & yes & none \\
 
 \section{SAPHIR sketch}
 SAPHIR (Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous) is a
-minimal pairing protocol; our prototype implements it in $\sim$600 lines of
+minimal pairing protocol; our prototype implements it in $\sim$800 lines of
 Python (\url{github.com/vaibhav-rm/SAPHIR}).
 Frames are length-prefixed CBOR envelopes,
 \texttt{u32be len $\parallel$ CBOR(\{v,type,seq,sender,nonce,payload\})}, capped
@@ -165,9 +165,9 @@ Who-talks-to-whom & n/a & out of scope \\
 Our prototype runs the full pairing plus a hotel-booking task (check then book)
 with no audio hardware (byte-identical framing; over-air as next step).
 Measured envelope sizes: HELLO $\sim$194\,B, KEY $\sim$107--113\,B,
-TASK \texttt{hotel.check} 134\,B and \texttt{hotel.book} 148\,B with a compact
-slot encoding (\texttt{date}$\to$\texttt{d}, \texttt{hotel.book}$\to$\texttt{hb};
-legacy full-form still decodes). A scripted attacker without session keys is
+TASK \texttt{hotel.check} 117\,B and \texttt{hotel.book} 131\,B with dictionary
+coding (\texttt{date}$\to$\texttt{d}, \texttt{hotel.book}$\to$\texttt{hb}, value
+shorts, omitted default ontology; legacy full-form still decodes). A scripted attacker without session keys is
 rejected (\texttt{InvalidTag}); an exact replay is rejected (sequence reuse);
 a legacy peer is kept in English with an explicit flag ---
 all three checks run as \texttt{evals/attacks.py}.

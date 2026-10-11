@@ -27,7 +27,7 @@ agents that share nothing but a bare audio channel: a three-phase handshake
 (HELLO~$\to$~WELCOME~$\to$~KEY1~$\to$~KEY2) with ephemeral X25519 keys, compact
 CBOR task encoding, ChaCha20-Poly1305 authenticated messaging, an optional
 stop-and-wait ARQ layer for lossy acoustics, and a human-readable sidecar audit
-log. An open prototype ($\sim$900 lines of Python) demonstrates a hotel-booking
+log. An open prototype ($\sim$1.6k lines of Python including tests and harnesses) demonstrates a hotel-booking
 dialogue end to end: 117--139\,B task frames across two domains, blocked spoof/replay/downgrade
 attacks, 100\% pairing success on clean channels, 95--100\% under bursty
 VoIP-like loss where raw frames score 0\%, and immediate cost breakeven that
@@ -73,7 +73,7 @@ Inter-agent Rendezvous): detect, negotiate, encrypt, collaborate in structured
 intents, and account for every exchange in a human-readable sidecar. We
 contribute (i) the protocol (handshake, compact encoding, AEAD messaging,
 optional ARQ); (ii) an explicit threat model with verified blocks; (iii) an
-open prototype with five evaluation harnesses; and (iv) a disciplined
+open prototype with seven evaluation harnesses; and (iv) a disciplined
 measured-vs-modeled accounting that states exactly what is (and is not)
 claimed. All artifacts are public to enable red-teaming.
 
@@ -164,13 +164,13 @@ Figure~\ref{fig:hs} summarizes the exchange.
 \end{figure}
 
 \section{Implementation}
-The prototype (\url{github.com/vaibhav-rm/SAPHIR}, MIT) is $\sim$900 lines of
+The prototype (\url{github.com/vaibhav-rm/SAPHIR}, MIT) is $\sim$1.6k lines of
 Python: \texttt{protocol} (envelopes), \texttt{session} (handshake state
 machine), \texttt{crypto} (X25519/HKDF/ChaCha), \texttt{codec} (compact maps),
 \texttt{channel} (in-memory, lossy, burst-error, ARQ link), \texttt{agents}
-(rule-based hotel task), \texttt{audit}, \texttt{metrics}. Five harnesses
+(rule-based hotel and taxi tasks), \texttt{audit}, \texttt{metrics}. Seven harnesses
 (\texttt{demo}, \texttt{bench}, \texttt{attacks}, \texttt{robustness},
-\texttt{reliability}, \texttt{codec\_profiles}, \texttt{amortization}) plus 14
+\texttt{reliability}, \texttt{codec\_profiles}, \texttt{amortization}) plus 16
 pytest tests cover functionality, attacks, and all sweeps. No audio hardware,
 API keys, or network are required; channels are in-process byte pipes with
 documented seeds.
