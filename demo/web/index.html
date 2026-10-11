@@ -3,80 +3,54 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SAPHIR — agents talking in beeps</title>
+<title>SAPHIR</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="stage">
-
   <header>
-    <div class="logo">SAPHIR <span>· secure acoustic pairing</span></div>
-    <div class="topright">
-      <span id="rolebadge">pick a role ↓</span>
-      <span class="mic"><span id="micdot" class="dot off"></span><span id="miclabel">mic off</span></span>
-    </div>
+    <div class="word">saphir</div>
+    <div class="hright"><span id="rolebadge"></span><span id="micdot" class="mdot"></span><span id="miclabel">mic off</span></div>
   </header>
 
-  <div id="modebanner" class="mode english">ENGLISH</div>
-  <div id="sessline" class="sessline">no session — open this page on two devices, or run both roles here</div>
+  <div id="modebanner" class="mode">ENGLISH</div>
+  <canvas id="wave" width="880" height="64"></canvas>
+  <div id="sessline"></div>
 
-  <section id="robots">
-    <div class="robot" id="robC">
-      <div class="ring"></div>
-      <div class="head">
-        <div class="eyes"><span></span><span></span></div>
-        <div class="mouth"><span></span><span></span><span></span><span></span><span></span></div>
-      </div>
-      <div class="name">📞 caller <em>your AI assistant</em></div>
+  <div id="feeds">
+    <div class="col">
+      <div class="who"><span id="dotC" class="sdot"></span>caller</div>
+      <div id="feedC" class="feed"></div>
     </div>
-    <div class="vs">⇄</div>
-    <div class="robot" id="robR">
-      <div class="ring"></div>
-      <div class="head">
-        <div class="eyes"><span></span><span></span></div>
-        <div class="mouth"><span></span><span></span><span></span><span></span><span></span></div>
-      </div>
-      <div class="name">🏨 receptionist <em>hotel AI</em></div>
+    <div class="col">
+      <div class="who"><span id="dotR" class="sdot"></span>receptionist</div>
+      <div id="feedR" class="feed"></div>
     </div>
-  </section>
+  </div>
 
-  <div id="banner" class="banner" hidden></div>
-
-  <section id="feeds">
-    <div class="feedcard"><h3>caller hears</h3><div id="feedC" class="feed"></div></div>
-    <div class="feedcard"><h3>receptionist hears</h3><div id="feedR" class="feed"></div></div>
-  </section>
-
-  <section id="auditcard">
-    <h3>📻 channel audit <span class="hint">every frame on air, decoded</span></h3>
-    <ul id="audit"></ul>
-  </section>
+  <div id="banner" hidden></div>
 
   <div id="controls" hidden>
-    <button id="btnStart" class="primary">▶ Start</button>
-    <button id="btnReplay" class="danger" disabled>⚔ Replay overheard tones</button>
-    <button id="btnForge" class="danger" disabled>⚔ Forge a TASK</button>
-    <button id="btnReset">Reset</button>
-    <span class="metrics">frames <b id="mFrames">0</b> · wire <b id="mBytes">0</b>B · blocked <b id="mBlocked">0</b></span>
-    <span id="chanline" class="chanline">idle</span>
+    <button id="btnStart">start</button>
+    <button id="btnReplay" disabled>replay overheard tones</button>
+    <button id="btnForge" disabled>forge a task</button>
+    <button id="btnReset">reset</button>
+    <span id="chanline">idle</span>
   </div>
+
+  <ul id="audit"></ul>
+  <div id="meta">frames <b id="mFrames">0</b> · wire <b id="mBytes">0</b>B · blocked <b id="mBlocked">0</b></div>
 
   <div id="picker" hidden>
     <div class="pickbox">
-      <h2>Who is this device?</h2>
-      <button onclick="pick('caller')">📞 I'm the caller</button>
-      <button onclick="pick('receptionist')">🏨 I'm the receptionist</button>
-      <button onclick="pick('both')">📻 Both — one device, loopback</button>
-      <p>Two-device mode is the real thing: open this page on two phones/laptops, pick one role
-         each, allow the mic, press Start on both. Same-device loopback works too (speaker → mic).</p>
+      <button onclick="pick('caller')">caller — this device calls out</button>
+      <button onclick="pick('receptionist')">receptionist — this device listens</button>
+      <button onclick="pick('both')">both — one device, loopback</button>
+      <p>two devices is the real thing. allow the mic. localhost or https required.</p>
     </div>
   </div>
 
-  <footer>
-    Real ggwave TX/RX (audible fast) · real ECDH P-256 + AES-GCM tasks · real replay/auth checks.
-    Browser TTS voices the English phase. Demo framing is compact JSON (≤138B);
-    the wire protocol uses CBOR — <code>docs/PROTOCOL.md</code>. Needs mic permission + localhost/HTTPS.
-  </footer>
+  <footer>real ggwave tx/rx · real ecdh + aes-gcm · json demo framing (wire: cbor)</footer>
 </div>
 
 <script src="vendor/ggwave.js"></script>

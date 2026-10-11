@@ -39,7 +39,8 @@ const UI = {
     }
   },
   mood(role, m) {
-    const el = $(role === "caller" ? "robC" : "robR");
+    const el = $(role === "caller" ? "dotC" : "dotR");
+    if (!el) return;
     el.classList.remove("speaking", "beeping", "listening", "blocked");
     if (m) el.classList.add(m);
   },
@@ -80,6 +81,7 @@ async function boot() {
   if (booted) return; booted = true;
   const ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
   await GG.init(ctx);
+  GG.scope($("wave"));
   try { await GG.startMic(); }
   catch (e) {
     UI.banner("⚠ Mic blocked — allow microphone access, then Reset. (localhost or HTTPS required)");
