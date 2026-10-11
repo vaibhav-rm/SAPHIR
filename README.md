@@ -35,14 +35,25 @@ Caller (AI) ──English──▶ Receptionist (AI)     [Act 1: wasteful STT→
 MCP/A2A/InterSAGE all assume IP + HTTPS. SAPHIR covers the gap they leave:
 **voice-only calls, PSTN-constrained trunks, offline / air-gapped rooms, noisy speakers.**
 
-## Quickstart (no speakers needed)
+## Demo (start here)
+
+**Web demo** — two agents, spoken English, real FSK tone bursts, live spectrogram,
+replay/forge attack buttons:
+
+```bash
+cd demo/web
+python3 -m http.server 8080
+# open http://localhost:8080
+```
+
+**CLI demo** (same 3 acts, terminal, no audio hardware):
 
 ```bash
 pip install -r requirements.txt
-
-# 3-act demo: talk → switch → attack blocked
 PYTHONPATH=src python demo/demo_cli.py
+```
 
+```bash
 # tests / benchmark / attacks / robustness sweep
 PYTHONPATH=src python -m pytest tests/ -q
 PYTHONPATH=src python evals/bench.py
