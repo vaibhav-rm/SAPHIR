@@ -21,7 +21,10 @@ LAN/devices need HTTPS). Allow the mic, press **Start** on both sides.
 
 - **Transport:** vendored official ggwave WASM (`vendor/ggwave.js`, MIT) —
   every frame is really FSK-modulated and really decoded from the mic
-  (audible-fast profile, ≤138B frames, Reed-Solomon on the wire).
+  (audible-**fastest** profile, ≤138B frames, Reed-Solomon on the wire, TX gain
+  dialed to 0.35 for ears). Fastest halves airtime vs fast (≈17s not ≈31s on
+  big frames) and retry absorbs the robustness cost. Ultrasound was rejected:
+  laptop speakers/mics roll off where it lives, so it would break the demo.
 - **Crypto:** ECDH P-256 key exchange + AES-GCM tasks with fresh random IVs,
   via WebCrypto. Replay sets mirror `src/saphir/`.
 - **Reliability:** response-driven retransmission — each reply doubles as the

@@ -8,9 +8,10 @@ const UI = {
   frames: 0, bytes: 0, blocked: 0,
 
   say(role, text, english, attack = false) {
+    const senderCls = english ? "" : role === "caller" ? " from-c" : " from-r";
     const show = (panel, cls) => {
       const d = document.createElement("div");
-      d.className = `msg ${cls}` + (attack ? " attack" : "") + (english ? "" : " beep");
+      d.className = `msg ${cls}` + (attack ? " attack" : "") + (english ? "" : " beep") + senderCls;
       d.textContent = text;
       const box = $(panel === "caller" ? "feedC" : "feedR");
       box.appendChild(d); box.scrollTop = box.scrollHeight;
@@ -87,6 +88,7 @@ async function boot() {
     UI.banner("⚠ Mic blocked — allow microphone access, then Reset. (localhost or HTTPS required)");
   }
   GG.onText = (text) => {
+    try { GG.flashPeer(JSON.parse(text).f); } catch (_) {}
     if (callerSess) callerSess.onAir(text);
     if (recepSess) recepSess.onAir(text);
   };

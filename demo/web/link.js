@@ -20,18 +20,27 @@ const GG = {
     params.sampleRateOut = ctx.sampleRate;
     this.inst = gg.init(params);
     this.gg = gg;
-    this.protocol = gg.ProtocolId.GGWAVE_PROTOCOL_AUDIBLE_FAST;
+    // FASTEST: ~2x shorter airtime than FAST (31s -> 17s on big frames) and a
+    // higher ceiling. Retry absorbs the robustness cost. Volume stays easy.
+    this.protocol = gg.ProtocolId.GGWAVE_PROTOCOL_AUDIBLE_FASTEST;
     // TX bus with a tap for the wave canvas; mic gets its own tap (no feedback).
-    this.txBus = ctx.createGain();
+    this.txBus = ctx.createGain(); this.txBus.gain.value = 0.35; // comfortable, still decodable
     this.txAn = ctx.createAnalyser(); this.txAn.fftSize = 2048;
     this.txBus.connect(this.txAn); this.txBus.connect(ctx.destination);
     this.micAn = ctx.createAnalyser(); this.micAn.fftSize = 2048;
-    this._txUntil = 0;
+    this._txUntil = 0; this._txColor = "#4ade80";
+    this._peerUntil = 0; this._peerColor = "#4ade80";
     this.ready = true;
   },
 
+  // Heard a decoded frame from peer f ('c' | 'r'): flash the wave in their color.
+  flashPeer(f) {
+    this._peerColor = f === "r" ? "#e0a030" : "#4ade80";
+    this._peerUntil = performance.now() + 1500;
+  },
+
   // Encode text -> real ggwave waveform -> play. Returns airtime ms.
-  async send(text) {
+  async send(text, color) {
     if (!this.ready) throw new Error("ggwave not initialized (click Start first)");
     if (text.length > 138) throw new Error(`payload ${text.length}B exceeds 138B ggwave budget`);
     this.setCapture(false);
@@ -41,6 +50,7 @@ const GG = {
     const src = this.ctx.createBufferSource();
     src.buffer = buf; src.connect(this.txBus);
     const ms = (wav.length / this.ctx.sampleRate) * 1000;
+    if (color) this._txColor = color;
     this._txUntil = performance.now() + ms;
     src.start();
     await new Promise((r) => { src.onended = r; setTimeout(r, ms + 400); });
@@ -98,16 +108,18 @@ const GG = {
       g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.stroke();
       if (this.micAn) {
         this.micAn.getByteTimeDomainData(mic);
-        g.strokeStyle = "#3d3d3d"; g.lineWidth = 1; g.beginPath();
+        const peerLive = performance.now() < this._peerUntil;
+        g.strokeStyle = peerLive ? this._peerColor : "#3d3d3d"; g.lineWidth = peerLive ? 1.5 : 1;
+        g.beginPath();
         mic.forEach((v, i) => {
           const x = (i / mic.length) * W, y = (v / 255) * H;
           i ? g.lineTo(x, y) : g.moveTo(x, y);
         });
-        g.stroke();
+        g.stroke(); g.lineWidth = 1;
       }
       if (this.txAn && performance.now() < this._txUntil + 300) {
         this.txAn.getByteTimeDomainData(tx);
-        g.strokeStyle = "#4ade80"; g.lineWidth = 1.5; g.beginPath();
+        g.strokeStyle = this._txColor; g.lineWidth = 1.5; g.beginPath();
         tx.forEach((v, i) => {
           const x = (i / tx.length) * W, y = (v / 255) * H;
           i ? g.lineTo(x, y) : g.moveTo(x, y);

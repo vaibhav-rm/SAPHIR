@@ -22,6 +22,7 @@
 const MAX_GG = 138;
 const ACK_TIMEOUT = 20000;
 const ACK_TRIES = 3;
+const ROLE_COLOR = { caller: "#4ade80", receptionist: "#e0a030" };
 
 class SaphSession {
   constructor(role, ui) {
@@ -51,7 +52,7 @@ class SaphSession {
     if (text.length > MAX_GG) throw new Error(`frame ${text.length}B over budget`);
     this.ui.robotBeep(this.role, true);
     this.ui.audit(this.role === "caller" ? "A→B" : "B→A", obj.t, text.length, text);
-    await GG.send(text);
+    await GG.send(text, ROLE_COLOR[this.role]);
     this.echoSent.add(text);
     if (this.echoSent.size > 60) this.echoSent.delete(this.echoSent.values().next().value);
     this.ui.robotBeep(this.role, false);
@@ -270,8 +271,9 @@ class SaphSession {
     if (!target) return;
     this.ui.say(this.role, "⚔ replaying captured tones…", false, true);
     this.echoSent.add(target); // mic will hear it too: suppress, process once
-    await GG.send(target); // same bytes, real airtime
+    await GG.send(target, ROLE_COLOR[this.role]); // same bytes, real airtime
     GG.setCapture(true);
+    // feed it to our own receiver exactly as the mic path would:
     await this.onAir(target, true); // seen-set rejects it
   }
 
@@ -285,7 +287,7 @@ class SaphSession {
     const evil = JSON.stringify(m);
     this.echoSent.add(evil);
     this.ui.say(this.role, "⚔ forging a TASK (flipped byte)…", false, true);
-    await GG.send(evil);
+    await GG.send(evil, ROLE_COLOR[this.role]);
     GG.setCapture(true);
     await this.onAir(evil, true); // AES-GCM open fails
   }
