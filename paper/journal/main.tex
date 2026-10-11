@@ -114,6 +114,28 @@ disclosure as future work rather than a solved claim.
 agentic-AI production (85\% exploring, 5\% in production)~\cite{ciscotrust};
 IETF drafts~\cite{ietf-agents} formalize the missing negotiation/fallback
 machinery. SAPHIR targets exactly that intersection for voice-only encounters.
+Table~\ref{tab:stack} summarizes the positioning: every prior row standardizes
+content while assuming IP transport; SAPHIR is the pairing layer for the one
+transport the stack omits.
+
+\begin{table}[h]
+\centering\small
+\caption{Acoustic pairing against the 2025--26 interop stack. SAPHIR complements
+rather than replaces these protocols (cf.\ InterSAGE's stance toward transports).}
+\label{tab:stack}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+System & Channel & Auth & Negotiation & Audio fallback \\
+\midrule
+Gibberlink & audio only & none (prompt) & none & itself, insecure \\
+MCP & HTTPS (tool) & yes & tools & none \\
+A2A & HTTPS (agent) & yes & Agent Cards & none \\
+ANP & HTTPS + DID & yes & DIDs & none \\
+InterSAGE & trust substrate & yes & credentials & none \\
+\textbf{SAPHIR} & \textbf{audio / hybrid} & \textbf{ephemeral keys} & \textbf{codec select} & \textbf{native} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Problem and threat model}
 Two heterogeneous voice agents share a low-bandwidth ($\sim$30\,Bps reference),
@@ -233,7 +255,7 @@ Cell & Raw & ARQ & Median retries (ARQ) \\
 clean 100\%, cafe-noise 95\%, bursty VoIP-like 95\%, harsh narrowband 80\% ---
 bounding the design's operating envelope; waveform/over-air measurement is
 explicitly future work. \emph{Amortization (Fig.~\ref{fig:amort}):} the 609\,B
-handshake amortizes over turns (mean 263\,B wire per pair); modeled neural-cost
+handshake amortizes over turns (mean 246\,B wire per pair); modeled neural-cost
 breakeven is immediate and $\sim$65$\times$ at 20 turns. Wall-clock is
 deliberately not claimed: narrowband audio moves fewer bytes/sec than speech,
 so SAPHIR trades time for near-zero neural compute; wire bytes stay above
