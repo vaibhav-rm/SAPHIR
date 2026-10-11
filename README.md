@@ -37,14 +37,19 @@ MCP/A2A/InterSAGE all assume IP + HTTPS. SAPHIR covers the gap they leave:
 
 ## Demo (start here)
 
-**Web demo** — two agents, spoken English, real FSK tone bursts, live spectrogram,
-replay/forge attack buttons:
+**Web demo — real ggwave.** Two agents, spoken English, then genuine FSK tone
+bursts (official ggwave WASM, decoded live from the mic) carrying ECDH +
+AES-GCM-encrypted tasks, with replay/forge attack buttons that really fail:
 
 ```bash
 cd demo/web
 python3 -m http.server 8080
-# open http://localhost:8080
+# open http://localhost:8080              (role picker)
+# two devices: ?role=caller + ?role=receptionist
 ```
+
+Needs mic permission + localhost/HTTPS. Headless logic test:
+`node demo/web/smoke-test.mjs`. Details: `demo/web/README.md`.
 
 **CLI demo** (same 3 acts, terminal, no audio hardware):
 

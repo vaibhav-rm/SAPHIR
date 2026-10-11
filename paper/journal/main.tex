@@ -247,8 +247,13 @@ raw-text-over-tones (structure plus auth tags), shown, not hidden.
 \end{figure}
 
 \section{Limitations and open questions}
-(1) No over-air validation yet --- all loss models are byte-level; real
-Opus/G.711 traces and room measurements are the next experiment. (2) Identity
+(1) No room-acoustics validation yet --- loss models are byte-level, though all
+framing now round-trips through the real ggwave implementation in-process and a
+browser demo drives genuine over-air exchange; Opus/G.711 traces and measured
+rooms are the next experiment. A learned lesson belongs here: the ggwave
+implementation shows content-dependent first-try decode misses, so retries must
+re-seal with fresh randomness rather than retransmit identical bytes --- our
+demo does exactly this. (2) Identity
 is ephemeral, not PKI-backed; upgrading the HELLO to verifiable credentials
 (where IP exists) is designed but unbuilt. Hand dictionaries are demo-scale;
 schema-driven dictionaries negotiated in HELLO are the scalable compression

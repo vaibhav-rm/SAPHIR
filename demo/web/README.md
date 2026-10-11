@@ -1,34 +1,48 @@
-# SAPHIR web demo
+# SAPHIR web demo — real ggwave, real crypto, real attacks
 
-The visible demo: two AI agents on a call, English first, then authenticated tone bursts.
+Two AI agents on a call, English first, then authenticated tone bursts.
+Open this page on **two devices** (phones/laptops), pick one role each —
+or run both roles on one device (speaker → mic loopback).
 
 ## Run it
 
 ```bash
 cd demo/web
 python3 -m http.server 8080
-# open http://localhost:8080
+# open http://localhost:8080/?role=caller   (device 1)
+# open http://localhost:8080/?role=receptionist   (device 2)
+# ...or ?role=both on a single device. No role = role picker.
 ```
 
-(No build step, no dependencies. `file://` also works, but a local server is
-more reliable for AudioContext autoplay policies. Click anywhere once if the
-browser blocks audio before first interaction.)
+Requires microphone permission + a secure context (localhost counts as secure;
+LAN/devices need HTTPS). Allow the mic, press **Start** on both sides.
 
-## What to click
+## What is real
 
-1. **▶ Run full demo** — Act 1 (spoken English via browser TTS) → Act 2
-   (HELLO/WELCOME/KEY beeps + TASK/RESULT beeps with live spectrogram) →
-   attack buttons unlock.
-2. **⚔ Replay last TASK** — replays the captured tones; the receiver's real
-   replay check rejects them (`seq reused`). Watch the audit panel.
-3. **⚔ Forge TASK** — flips a byte; rejected as an auth failure.
-4. **silent** checkbox — skips audio for fast/volume-off runs.
+- **Transport:** vendored official ggwave WASM (`vendor/ggwave.js`, MIT) —
+  every frame is really FSK-modulated and really decoded from the mic
+  (audible-fast profile, ≤138B frames, Reed-Solomon on the wire).
+- **Crypto:** ECDH P-256 key exchange + AES-GCM tasks with fresh random IVs,
+  via WebCrypto. Replay sets mirror `src/saphir/`.
+- **Reliability:** response-driven retransmission — each reply doubles as the
+  ACK (HELLO→WELCOME→KEY1→KEY2→TASK→RESULT→DONE), up to 3 tries. Retries
+  re-seal with fresh IVs: ggwave has content-dependent first-try misses, so
+  retransmitting identical bytes would replay a poison payload forever.
+- **Attacks:** ⚔ Replay re-transmits captured tones (rejected by seq sets);
+  ⚔ Forge flips a ciphertext byte with a fresh seq (rejected by AES-GCM).
+- English lines are spoken with browser TTS.
 
-## What's real vs simulated (stated in the page footer too)
+## Headless test (no mic needed)
 
-- **Real:** every tone burst FSK-encodes that frame's actual bytes
-  (preamble + length + payload, mark/space tones); the receiver's
-  replay/auth decisions run real check logic mirroring `src/saphir/`.
-- **Simulated:** acoustic capture/decode (bytes pass through reliably) and the
-  key exchange display. Audited X25519/ChaCha lives in `src/saphir/crypto.py`;
-  the demo page is JSON-framed while the wire protocol uses CBOR.
+```bash
+node demo/web/smoke-test.mjs
+```
+
+Drives both sessions through loopback delivery with real crypto, one injected
+TASK loss (retry must save it), then all four attacks. Must print SMOKE OK.
+
+## What's still demo-grade
+
+JSON framing (wire protocol uses CBOR), illustrative DIDs, two-party only.
+Audited protocol code: `src/saphir/`. Frame shapes are regression-guarded by
+`evals/ggwave_frames.py` against the real Python ggwave build.

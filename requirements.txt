@@ -1,3 +1,6 @@
 cbor2>=5.0
 cryptography>=42.0
 pytest>=8.0
+# Real ggwave over-air codec (C++ extension; needs a compiler to build).
+# Optional: everything except evals/ggwave_frames.py runs without it.
+ggwave>=0.4.0
