@@ -24,6 +24,13 @@ PROTOCOL_VERSION = 1
 MAX_MSG_BYTES = 200  # TASK/RESULT must fit; handshake frames are smaller
 LEN_PREFIX = struct.Struct(">I")
 
+# Compact handshake codebooks: codec/mode strings never go on the wire.
+CODEC_IDS = {1: "saphir-cbor-v1"}
+CODEC_NAMES = {v: k for k, v in CODEC_IDS.items()}
+MODE_AUDIO = 1
+MODE_HYBRID = 2
+DEFAULT_MODES = MODE_AUDIO | MODE_HYBRID
+
 
 class MsgType(str, Enum):
     HELLO = "HELLO"
@@ -92,11 +99,24 @@ def decode_envelope(buf: bytes) -> tuple[Envelope, bytes]:
 
 
 def build_hello(agent_id: str, did: str, seq: int = 0) -> Envelope:
-    p = HelloPayload(agent_id=agent_id, did=did)
+    # Compact: agent_id == envelope sender (not repeated), no duplicate nonce
+    # (the envelope nonce covers freshness), int codec/mode codebooks, int ts.
     return Envelope(type=MsgType.HELLO, seq=seq, sender=agent_id,
-                    nonce=p.nonce, payload={"agent_id": p.agent_id, "did": p.did,
-                                            "codecs": p.codecs, "modes": p.modes,
-                                            "nonce": p.nonce, "ts": p.ts})
+                    nonce=os.urandom(16),
+                    payload={"did": did, "codec": [CODEC_NAMES["saphir-cbor-v1"]],
+                             "modes": DEFAULT_MODES, "ts": int(time.time())})
+
+
+def normalize_codecs(v) -> list:
+    if isinstance(v, int):
+        return [CODEC_IDS.get(v, f"unknown-{v}")]
+    return list(v or [])
+
+
+def normalize_selected(v, default: str = "saphir-cbor-v1") -> str:
+    if isinstance(v, int):
+        return CODEC_IDS.get(v, default)
+    return v or default
 
 
 def build_task(sender: str, seq: int, intent: str, slots: dict,

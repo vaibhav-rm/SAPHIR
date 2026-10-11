@@ -1,4 +1,4 @@
-"""Amortization: one 609B handshake, then how do cost/time/bytes scale with turns?
+"""Amortization: one 463B handshake, then how do cost/time/bytes scale with turns?
 
 Compares, per dialogue length N:
 - English-over-tones (Gibberlink-style): ~54B wire + full STT->LLM->TTS per turn.

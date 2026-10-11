@@ -199,9 +199,9 @@ documented seeds.
 
 \section{Evaluation}
 \emph{Functionality.} Full pairing plus a two-intent booking dialogue runs end
-to end; measured sizes: handshake 609\,B one-time, HELLO $\sim$194\,B,
-KEY $\sim$107--113\,B, all four TASK frames 117--139\,B compact (hotel and
-taxi domains), RESULT 126--139\,B.
+to end; measured sizes: handshake 463\,B one-time, HELLO $\sim$115\,B, WELCOME
+$\sim$128\,B, KEY $\sim$107--113\,B, all four TASK frames 117--139\,B compact (hotel and
+taxi domains), RESULT 126--139\,B --- every frame fits one ggwave transmission.
 
 \emph{Attacks (Table~\ref{tab:threat}).} A keyless attacker is rejected
 (\texttt{InvalidTag}); exact replays are rejected (sequence reuse); legacy
@@ -254,7 +254,7 @@ Cell & Raw & ARQ & Median retries (ARQ) \\
 \emph{Codec/noise profiles (byte-level burst models, 20 trials):}
 clean 100\%, cafe-noise 95\%, bursty VoIP-like 95\%, harsh narrowband 80\% ---
 bounding the design's operating envelope; waveform/over-air measurement is
-explicitly future work. \emph{Amortization (Fig.~\ref{fig:amort}):} the 609\,B
+explicitly future work. \emph{Amortization (Fig.~\ref{fig:amort}):} the 463\,B
 handshake amortizes over turns (mean 246\,B wire per pair); modeled neural-cost
 breakeven is immediate and $\sim$65$\times$ at 20 turns. Wall-clock is
 deliberately not claimed: narrowband audio moves fewer bytes/sec than speech,

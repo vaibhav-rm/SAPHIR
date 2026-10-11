@@ -15,7 +15,7 @@ PYTHONPATH=src python evals/attacks.py
 | Metric | Value |
 |---|---|
 | English dialogue | 214 chars (~54 tokens) |
-| SAPHIR handshake (one-time) | 609 B |
+| SAPHIR handshake (one-time) | 463 B |
 | SAPHIR tasks (2 intents + 2 results, compact encoding) | 494 B (tasks alone 248 B) |
 | TASK hotel.check / hotel.book wire size | 117 B / 131 B (was 182/202 B full-form) |
 | TASK taxi.request / taxi.book wire size | 128 B / 139 B (non-default ontology) |
@@ -26,7 +26,7 @@ PYTHONPATH=src python evals/attacks.py
 (CBOR + 16B auth tags + envelope overhead). The saving is **neural compute**
 (no TTS/STT/LLM forward passes per turn; tone decode is ms of CPU), not raw
 byte count. Byte-compaction for tasks has landed (all task frames single-frame,
-117--139 B); handshake frames (~194 B) still take two transmissions.
+117--139 B); every frame including handshake (~115--128 B) fits one transmission.
 
 Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 32 Bps audible-fast goodput). Tune and cite before submitting.
@@ -83,7 +83,7 @@ exhaustion (bounded budget), not integrity failures. Repro:
 
 ## 6. Amortization (measured bytes, modeled cost/time; `evals/amortization.py`)
 
-One 609B handshake (measured), then rotating check/book turns (mean 246B wire
+One 463B handshake (measured), then rotating check/book turns (mean 246B wire
 per TASK+RESULT pair, measured). English baseline: 53.5 chars/turn (measured
 from the dialogue script) sent as raw text-over-tones + full STT→LLM→TTS per
 turn (modeled in `metrics.py`). SAPHIR turns cost nominal CPU only (stated
@@ -92,11 +92,11 @@ for other ggwave profiles; bytes are the hard numbers.
 
 | turns | eng wire B | saphir wire B | eng cost $ | saphir cost $ | eng sec | saphir sec |
 |---|---|---|---|---|---|---|
-| 1 | 54 | 843 | 0.0013 | 0.00002 | 5.0 | 26.7 |
-| 2 | 108 | 1103 | 0.0027 | 0.00004 | 10.0 | 35.3 |
-| 4 | 216 | 1593 | 0.0053 | 0.00008 | 20.1 | 51.4 |
-| 8 | 432 | 2577 | 0.0107 | 0.00016 | 40.2 | 83.7 |
-| 20 | 1080 | 5529 | 0.0266 | 0.00040 | 100.4 | 180.8 |
+| 1 | 54 | 697 | 0.0013 | 0.00002 | 5.0 | 22.2 |
+| 2 | 108 | 957 | 0.0027 | 0.00004 | 10.0 | 30.7 |
+| 4 | 216 | 1447 | 0.0053 | 0.00008 | 20.1 | 46.8 |
+| 8 | 432 | 2431 | 0.0107 | 0.00016 | 40.2 | 79.2 |
+| 20 | 1080 | 5383 | 0.0266 | 0.00040 | 100.4 | 176.2 |
 
 Reading for the paper: **cost breakeven is immediate and grows (~65× at 20
 turns)** — that, plus determinism and security, is the claimed win.

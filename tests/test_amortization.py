@@ -6,7 +6,7 @@ from amortization import measure, rows, english_turn_cost
 
 def test_handshake_and_turn_sizes_sane():
     hs, turns = measure()
-    assert 500 <= hs <= 800, hs
+    assert 350 <= hs <= 800, hs
     assert all(100 <= t <= 400 for t in turns), turns
 
 

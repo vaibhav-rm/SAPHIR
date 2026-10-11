@@ -3,6 +3,8 @@ from .protocol import (
     MsgType, HelloPayload, TaskPayload, Envelope,
     encode_envelope, decode_envelope,
     build_hello, build_task, PROTOCOL_VERSION,
+    CODEC_IDS, CODEC_NAMES, MODE_AUDIO, MODE_HYBRID,
+    normalize_codecs, normalize_selected,
 )
 from .crypto import EphemeralKeypair, SessionKeys, derive_session_keys
 from .codec import compact_task, expand_task
@@ -17,7 +19,8 @@ __version__ = "0.1.0"
 __all__ = [
     "MsgType", "HelloPayload", "TaskPayload", "Envelope",
     "encode_envelope", "decode_envelope", "build_hello", "build_task",
-    "PROTOCOL_VERSION", "EphemeralKeypair", "SessionKeys", "derive_session_keys",
+    "PROTOCOL_VERSION", "CODEC_IDS", "CODEC_NAMES", "MODE_AUDIO", "MODE_HYBRID",
+    "normalize_codecs", "normalize_selected", "EphemeralKeypair", "SessionKeys", "derive_session_keys",
     "SaphirSession", "SessionState", "HandshakeError",
     "compact_task", "expand_task",
     "InMemoryChannel", "LossyChannel", "ChannelStats",

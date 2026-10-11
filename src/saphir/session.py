@@ -35,7 +35,7 @@ class PeerInfo:
 
 
 def _fresh_did(agent_id: str) -> str:
-    return f"did:key:z{agent_id}-{os.urandom(4).hex()}"
+    return f"did:key:z{os.urandom(4).hex()}"
 
 
 class SaphirSession:
@@ -60,23 +60,27 @@ class SaphirSession:
         return env
 
     def handle_hello(self, env: Envelope) -> Envelope:
+        from .protocol import normalize_codecs
         p = env.payload
         if not isinstance(p, dict) or "did" not in p:
             raise HandshakeError("malformed HELLO")
-        self.peer = PeerInfo(agent_id=p.get("agent_id", ""), did=p["did"],
-                             codecs=p.get("codecs", []))
+        self.peer = PeerInfo(agent_id=p.get("agent_id", env.sender), did=p["did"],
+                             codecs=normalize_codecs(p.get("codec", p.get("codecs", []))))
         # answer WELCOME (echo our did + selected codec)
         self.state = SessionState.HELLO_SENT
         return Envelope(type=MsgType.WELCOME, seq=self.seq, sender=self.agent_id,
                         nonce=os.urandom(16),
-                        payload={"agent_id": self.agent_id, "did": self.did,
-                                 "codecs": ["saphir-cbor-v1"], "selected": self.selected_codec,
-                                 "ts": time.time()})
+                        payload={"did": self.did, "codec": [1],
+                                 "sel": 1, "modes": 3, "ts": int(time.time())})
 
     def handle_welcome(self, env: Envelope) -> Envelope:
+        from .protocol import normalize_selected
         p = env.payload
         self.peer = Peerinfo_fix(p)
-        self.selected_codec = p.get("selected", self.selected_codec)
+        if not self.peer.agent_id:
+            self.peer.agent_id = env.sender
+        self.selected_codec = normalize_selected(p.get("sel", p.get("selected")),
+                                                 self.selected_codec)
         key1 = Envelope(type=MsgType.KEY1, seq=self.seq, sender=self.agent_id,
                         nonce=os.urandom(16), payload={"pub": self._kp.pub_bytes})
         self.seq += 1
@@ -135,5 +139,6 @@ class SaphirSession:
 
 
 def Peerinfo_fix(p: dict) -> PeerInfo:
+    from .protocol import normalize_codecs
     return PeerInfo(agent_id=p.get("agent_id", ""), did=p.get("did", ""),
-                    codecs=p.get("codecs", []))
+                    codecs=normalize_codecs(p.get("codec", p.get("codecs", []))))

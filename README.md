@@ -99,8 +99,8 @@ See [`docs/PROTOCOL.md`](docs/PROTOCOL.md) for the wire spec,
 5. **Sidecar**: every frame appended to JSONL with human summary + decrypted view
 
 Frame: `u32be len ‖ CBOR({v, type, seq, sender, nonce, payload})`, cap 200B.
-Measured: HELLO ~194B, KEY ~107-113B, TASK ~117-139B (hotel + taxi), RESULT ~126-139B
-(all task frames fit one ggwave audible transmission; handshake takes two).
+Measured: HELLO ~115B, WELCOME ~128B, KEY ~107-113B, TASK ~117-139B (hotel + taxi), RESULT ~126-139B
+(every frame fits one ggwave audible transmission).
 
 ## Security properties (MVP)
 

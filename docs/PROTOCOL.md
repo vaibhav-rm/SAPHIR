@@ -1,8 +1,7 @@
 # SAPHIR Wire Spec v0.1 (MVP)
 
-Transport: any ordered byte pipe. Reference acoustic mapping: 1 envelope ≈ 1–2
-ggwave audible transmissions (ggwave reliable payload per tx is well under 200B
-in noisy rooms; handshake frames are the largest).
+Transport: any ordered byte pipe. Reference acoustic mapping: 1 envelope ≈ 1
+ggwave audible transmission (all current frames fit the single-frame budget).
 
 Frame: `u32be len || CBOR({v, type, seq, sender, nonce, payload})`.
 Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
@@ -11,8 +10,8 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 
 | Type | Dir | Plaintext payload | Notes |
 |---|---|---|---|
-| HELLO | A→B | {agent_id, did, codecs, modes, nonce(16B), ts} | ephemeral `did:key:z…` |
-| WELCOME | B→A | {… + selected} | codec negotiation |
+| HELLO | A→B | {did, codec:[int], modes:int bitmask, ts:int} | ephemeral `did:key:z…`; agent = envelope sender |
+| WELCOME | B→A | {did, codec:[int], sel:int, modes:int, ts:int} | codec negotiation by id |
 | KEY1 | A→B | {pub: 32B} | X25519 ephemeral |
 | KEY2 | B→A | {pub: 32B} | both derive HKDF-SHA256 → 32B ChaCha key |
 | TASK | ↔ | ChaCha20Poly1305(cbor({intent, slots, ontology, ts})), aad=sender, nonce=12B | replay-protected |
@@ -23,19 +22,17 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 
 | Message | Bytes | Notes |
 |---|---|---|
-| HELLO | ~194 | largest; shrink path: 8B nonce, shorter DID |
-| WELCOME | ~195 | echo + selected codec |
+| HELLO | ~115 | compact: short DID, int codec/mode codebooks, int ts |
+| WELCOME | ~128 | echo + selected codec (int), same compaction |
 | KEY1 / KEY2 | ~107 / 113 | 32B pubkey + envelope |
 | TASK hotel.check | ~117 | encrypted, compact encoding — fits single frame |
 | TASK hotel.book | ~131 | encrypted, compact — fits single frame |
 | TASK taxi.request / taxi.book | ~128 / 139 | non-default ontology (`st1` tag), fits single frame |
 | RESULT | ~126–139 | encrypted |
 
-Shrinking below 140B single-frame for all messages is done for tasks via
-dictionary coding (slot shorts, value shorts for rooms/locations/dates,
-omitted default ontology, second-resolution timestamps). Handshake frames
-(HELLO/WELCOME ~194B) still need two transmissions; sub-140B handshake
-compaction is open work. Hand dictionaries are demo-scale by design;
+Single-frame throughout: handshake compaction (dropped duplicate id/nonce,
+int codebooks, short DIDs, int timestamps) brought HELLO/WELCOME under the
+140B budget alongside tasks. Hand dictionaries are demo-scale by design;
 schema-driven dictionaries negotiated in HELLO are the scalable version
 (future work, listed as an RQ in the manuscript).
 
