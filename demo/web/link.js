@@ -96,7 +96,26 @@ const GG = {
     this.setCapture(true); // mic live; onaudioprocess now fires
   },
 
-  // Single thin wave: mic level always (dim), TX waveform overlaid (bright).
+  // Mic self-test: play a short probe and listen for our own decode.
+  // Returns true if this device can hear itself (loopback path works).
+  async probe() {
+    const stamp = Math.random().toString(16).slice(2, 6);
+    const text = JSON.stringify({ t: "PROBE", q: stamp });
+    return new Promise(async (resolve) => {
+      this._probe = { text, resolve };
+      try { await this.send(text); } catch (_) { this._probe = null; resolve(false); return; }
+      this.setCapture(true);
+      setTimeout(() => {
+        if (this._probe) { this._probe = null; resolve(false); }
+      }, 12000);
+    });
+  },
+  probeEat(text) {
+    if (this._probe && text === this._probe.text) {
+      const r = this._probe.resolve; this._probe = null; r(true); return true;
+    }
+    return false;
+  },
   scope(canvas) {
     const g = canvas.getContext("2d");
     const mic = new Uint8Array(2048), tx = new Uint8Array(2048);

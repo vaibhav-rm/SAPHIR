@@ -88,12 +88,23 @@ async function boot() {
     UI.banner("⚠ Mic blocked — allow microphone access, then Reset. (localhost or HTTPS required)");
   }
   GG.onText = (text) => {
+    if (GG.probeEat(text)) return;
     try { GG.flashPeer(JSON.parse(text).f); } catch (_) {}
     if (callerSess) callerSess.onAir(text);
     if (recepSess) recepSess.onAir(text);
   };
   callerSess = new SaphSession("caller", UI);
   recepSess = new SaphSession("receptionist", UI);
+  if (role === "both") {
+    callerSess.directPeer = recepSess;
+    recepSess.directPeer = callerSess;
+  }
+  UI.sessionLine("mic self-test… playing a probe tone");
+  const heard = await GG.probe();
+  UI.sessionLine(heard
+    ? "mic hears this device ✓ — pure over-air from here"
+    : "mic can't hear itself — check volume/permission" +
+      (role === "both" ? " · direct feed backing up" : " · replies may stall"));
   UI.sessionLine("ggwave ready · audible fast · mic live — press Start");
 }
 

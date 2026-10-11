@@ -15,7 +15,14 @@ python3 -m http.server 8080
 ```
 
 Requires microphone permission + a secure context (localhost counts as secure;
-LAN/devices need HTTPS). Allow the mic, press **Start** on both sides.
+LAN/devices need HTTPS). Allow the mic, press **Start** on both sides. Start
+begins with a mic self-test (a probe tone looped back); the result is shown
+under the wave so a deaf mic is diagnosed, not a mystery stall.
+
+In `?role=both` the peer session is additionally fed directly 1.2s after each
+transmission — if the mic already delivered the frame, dedupe drops the copy;
+if the mic is deaf, the copy saves the demo. Tones still really play either
+way; two-device mode is pure over-air.
 
 ## What is real
 

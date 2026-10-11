@@ -43,6 +43,8 @@ class SaphSession {
     this.recent = new Map();     // raw text -> ms: mic re-decodes one burst N times
     this.welcomed = false;
     this.waiters = [];           // {types, resolve} — response-driven retry
+    this.directPeer = null;      // both-mode: peer session fed directly as mic backup
+    this.directDelay = 1200;     // ms after TX before the direct copy is offered
     this.inventory = { dbl: { price: 120, left: 3 }, sng: { price: 80, left: 5 } };
   }
 
@@ -57,6 +59,13 @@ class SaphSession {
     if (this.echoSent.size > 60) this.echoSent.delete(this.echoSent.values().next().value);
     this.ui.robotBeep(this.role, false);
     GG.setCapture(true);
+    if (this.directPeer) {
+      // Both-mode backup: offer the frame directly after airtime. If the mic
+      // already delivered it, dedupe drops this copy; if the mic is deaf, it
+      // saves the demo. Tones still really played either way.
+      const peer = this.directPeer;
+      setTimeout(() => { try { peer.onAir(text, false, "direct"); } catch (_) {} }, this.directDelay);
+    }
     return text;
   }
 
@@ -88,7 +97,7 @@ class SaphSession {
     });
   }
 
-  async onAir(text, direct = false) {
+  async onAir(text, direct = false, via = null) {
     let m;
     try { m = JSON.parse(text); } catch (_) { return; } // not ours
     if (!m.t || m.f === this.me) return;                 // wrong format / own echo
@@ -99,7 +108,7 @@ class SaphSession {
     if (!direct && this.recent.has(text) && now - this.recent.get(text) < 3000) return;
     this.recent.set(text, now);
     this.ui.audit(m.f === "c" ? "A→B" : "B→A", m.t + " ⇄rx", text.length,
-      (direct ? "[attack path] " : "") + text.slice(0, 140));
+      (direct ? "[attack path] " : via ? `[${via}] ` : "") + text.slice(0, 140));
     for (const w of this.waiters.splice(0))              // wake up sendRecv first…
       if (w.types.includes(m.t)) w.resolve(m);
     if (this.role === "caller") await this._callerRecv(m, direct);
