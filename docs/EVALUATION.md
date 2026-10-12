@@ -172,3 +172,18 @@ a stray post-handshake TASK gets a plaintext `ERROR/no-capability`).
 Verified flows: exact match, fast decline (`taxi.book` vs hotel-only host),
 and maybe-confirm for unregistered (`photos.print`) capabilities.
 Repro: `PYTHONPATH=src:evals python -m pytest tests/test_caps.py -q`.
+
+## 12. Session resumption (`src/saphir/resume.py`, `tests/test_resume.py`)
+
+Full pairing stores (psk, ticket_id) under the peer's stable deployment DID
+(ephemeral per-session DIDs rotate and can never resume — documented tradeoff).
+Return HELLO carries `{resume, cr}`; matching WELCOME echoes `{resumed, sr}`;
+traffic keys = HKDF(psk, cr || sr), fresh every visit. Responder enters
+RESUMING and only reaches ESTABLISHED on the first successful AEAD open, so
+resumption authenticates implicitly. Tickets expire by TTL and uses (default 3);
+unknown/expired tickets fall back to a full handshake silently.
+
+Measured: resumed pairing costs HELLO+WELCOME = 273B vs 451B full (~40% saved,
+2 frames not 4). Verified: abbreviated success with task flow, silent fallback,
+expiry-forced full handshake, and keyless-attacker open rejected.
+Repro: `PYTHONPATH=src:evals python -m pytest tests/test_resume.py -q`.

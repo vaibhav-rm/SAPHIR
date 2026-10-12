@@ -22,6 +22,7 @@ Constraint: **no conference travel.** So the path is journal + preprint, not ven
 - [x] Amortization curve (handshake cost vs dialogue length; §6 + figure)
 - [x] Capability discovery preliminary (bloom + verdicts; §11 — schema-driven open vocabularies still future)
 - [x] Impostor-responder demo pinning the PKI gap (§10)
+- [x] Session resumption with tickets + expiry (§12)
 - [x] Decoder characterization (single-shot fragility documented; §9 — real rooms still future)
 - [x] Expanded related work (full survey table, not just the Blue Sky paragraph)
 - [x] Reproducibility appendix (commands, seeds, artifact link)

@@ -10,8 +10,8 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 
 | Type | Dir | Plaintext payload | Notes |
 |---|---|---|---|
-| HELLO | A→B | {did, codec:[int], modes:int, ts:int, need?, have?, bloom?} | need = id or open string; have = bitmask; empties omitted |
-| WELCOME | B→A | {did, sel:int, modes:int, ts:int, for?, match?:2\|1\|0} | exact/maybe/no verdict |
+| HELLO | A→B | {did, codec:[int], modes:int, ts:int, need?, have?, bloom?, resume?, cr?} | resume = ticket id; cr = client random |
+| WELCOME | B→A | {did, sel:int, modes:int, ts:int, for?, match?, resumed?, sr?} | resumed echo + server random on ticket hit |
 | KEY1 | A→B | {pub: 32B} | X25519 ephemeral |
 | KEY2 | B→A | {pub: 32B} | both derive HKDF-SHA256 → 32B ChaCha key |
 | TASK | ↔ | ChaCha20Poly1305(cbor({intent, slots, ontology, ts})), aad=sender, nonce=12B | replay-protected |
@@ -23,6 +23,7 @@ Cap: `MAX_MSG_BYTES = 200` for TASK/RESULT (see `src/saphir/protocol.py`).
 | Message | Bytes | Notes |
 |---|---|---|
 | HELLO | ~107–130 | bare / with need / with offers; all single-frame |
+| HELLO resumed | ~130 | +ticket id and client random, still single-frame |
 | WELCOME | ~132 | verdict fields included, single-frame |
 | KEY1 / KEY2 | ~107 / 113 | 32B pubkey + envelope |
 | TASK hotel.check | ~117 | encrypted, compact encoding — fits single frame |

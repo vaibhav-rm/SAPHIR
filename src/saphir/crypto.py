@@ -48,9 +48,17 @@ class SessionKeys:
         return pt
 
 
-def derive_session_keys(ours: EphemeralKeypair, theirs_pub: bytes,
-                        salt: bytes = b"saphir-v1", info: bytes = b"saphir-task") -> SessionKeys:
+def exchange(ours: EphemeralKeypair, theirs_pub: bytes) -> bytes:
     from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PublicKey
-    shared = ours.priv.exchange(X25519PublicKey.from_public_bytes(theirs_pub))
+    return ours.priv.exchange(X25519PublicKey.from_public_bytes(theirs_pub))
+
+
+def keys_from_shared(shared: bytes, salt: bytes = b"saphir-v1",
+                     info: bytes = b"saphir-task") -> SessionKeys:
     key = HKDF(algorithm=hashes.SHA256(), length=32, salt=salt, info=info).derive(shared)
     return SessionKeys(key=key)
+
+
+def derive_session_keys(ours: EphemeralKeypair, theirs_pub: bytes,
+                        salt: bytes = b"saphir-v1", info: bytes = b"saphir-task") -> SessionKeys:
+    return keys_from_shared(exchange(ours, theirs_pub), salt, info)
