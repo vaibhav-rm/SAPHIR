@@ -201,7 +201,8 @@ Python: \texttt{protocol} (envelopes), \texttt{session} (handshake state
 machine), \texttt{link} (one-call pairing API), \texttt{crypto} (X25519/HKDF/ChaCha), \texttt{codec} (compact maps),
 \texttt{caps} (capability bitmask + bloom), \texttt{resume} (tickets),
 \texttt{channel} (in-memory, lossy, burst-error, ARQ link), \texttt{agents}
-(rule-based hotel and taxi tasks), \texttt{audit}, \texttt{metrics}. Ten harnesses
+(rule-based hotel and taxi tasks), \texttt{llm} (Ollama-backed planners/narrators
+with validated plans), \texttt{audit}, \texttt{metrics}. Ten harnesses
 (\texttt{demo}, \texttt{bench}, \texttt{attacks}, \texttt{robustness},
 \texttt{reliability}, \texttt{codec\_profiles}, \texttt{amortization},
 \texttt{ggwave\_frames}, \texttt{decoder\_fragility}, \texttt{mitm}) plus 28
@@ -215,7 +216,9 @@ to end; measured sizes: handshake 463\,B one-time, HELLO $\sim$115\,B, WELCOME
 $\sim$128\,B, KEY $\sim$107--113\,B, all four TASK frames 117--139\,B compact (hotel and
 taxi domains), RESULT 126--139\,B --- every frame fits one ggwave transmission.
 Local compute is negligible next to airtime (full handshake 0.22\,ms,
-task seal/open $\sim$10--20\,$\mu$s measured).
+task seal/open $\sim$10--20\,$\mu$s measured). An Ollama-backed variant runs the
+same dialogue with LLM-planned tasks and spoken English (12\,s end to end), and
+mock-backed tests cover the agent logic with zero inference.
 
 \emph{Attacks (Table~\ref{tab:threat}).} A keyless attacker is rejected
 (\texttt{InvalidTag}); exact replays are rejected (sequence reuse); legacy

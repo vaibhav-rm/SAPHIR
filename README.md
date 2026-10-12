@@ -58,6 +58,13 @@ pip install -r requirements.txt
 PYTHONPATH=src python demo/demo_cli.py
 ```
 
+**AI dialogue** — two real local models (Ollama `qwen2.5:1.5b`) hold the English
+opening, then pair and book over SAPHIR (`--backend mock` needs nothing):
+
+```bash
+PYTHONPATH=src python demo/ai_dialogue.py --backend ollama
+```
+
 ```bash
 # tests / benchmark / attacks / robustness sweep
 PYTHONPATH=src python -m pytest tests/ -q

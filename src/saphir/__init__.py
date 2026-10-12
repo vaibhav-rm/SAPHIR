@@ -10,6 +10,8 @@ from .crypto import EphemeralKeypair, SessionKeys, derive_session_keys, exchange
 from .codec import compact_task, expand_task
 from .caps import BloomFilter, match, offered_bitmask, INTENT_IDS, INTENT_NAMES
 from .resume import TicketStore, Ticket, ticket_id, ticket_from_shared, resumed_keys
+from .llm import (LLMBackend, MockBackend, OllamaBackend, AgentCaller,
+                  AgentReceptionist, extract_json, coerce_plan)
 from .session import SaphirSession, SessionState, HandshakeError
 from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats,
                       BurstChannel, ChannelProfile, PROFILES)
@@ -29,6 +31,8 @@ __all__ = [
     "compact_task", "expand_task",
     "BloomFilter", "match", "offered_bitmask", "INTENT_IDS", "INTENT_NAMES",
     "TicketStore", "Ticket", "ticket_id", "ticket_from_shared", "resumed_keys",
+    "LLMBackend", "MockBackend", "OllamaBackend", "AgentCaller",
+    "AgentReceptionist", "extract_json", "coerce_plan",
     "InMemoryChannel", "LossyChannel", "ChannelStats",
     "ReliableLink", "LinkStats",
     "BurstChannel", "ChannelProfile", "PROFILES",

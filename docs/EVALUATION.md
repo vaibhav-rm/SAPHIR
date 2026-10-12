@@ -190,5 +190,18 @@ unknown/expired tickets fall back to a full handshake silently.
 
 Measured: resumed pairing costs HELLO+WELCOME = 273B vs 451B full (~40% saved,
 2 frames not 4). Verified: abbreviated success with task flow, silent fallback,
-expiry-forced full handshake, and keyless-attacker open rejected.
+expiry-forced full handshake, and keyless-attacker rejection verified.
 Repro: `PYTHONPATH=src:evals python -m pytest tests/test_resume.py -q`.
+
+## 13. Real-AI integration (`src/saphir/llm.py`, `demo/ai_dialogue.py`)
+
+Two qwen2.5:1.5b instances (local Ollama, temperature 0) hold the English
+opening, then pair and transact over SAPHIR — measured end run: switch on
+timeout (small model skipped the AI-mention), exact-verdict pairing in 465B,
+LLM-planned check ($120, 3 left) then book (confirmed HB-2026-1142), LLM
+narration, 12s total, 973B on the wire. Design rules: planning output is
+validated/coerced (unknown intents fall back, never reach the wire);
+inventory stays deterministic (LLM plans and narrates, never touches state).
+Mock-backed tests (`tests/test_llm.py`) cover coercion hardening, both switch
+paths, and the full dialogue with zero inference. Repro (needs Ollama):
+`PYTHONPATH=src python demo/ai_dialogue.py --backend ollama`.

@@ -22,6 +22,8 @@ Artifact: \url{https://github.com/vaibhav-rm/SAPHIR} (MIT, research prototype).
 | Impostor demo (expected-break) | `PYTHONPATH=src python evals/mitm.py` |
 | Resumption showcase | `PYTHONPATH=src python evals/resumption.py` |
 | CPU profiling | `PYTHONPATH=src python evals/perf.py` |
+| AI dialogue (mock, no model) | `PYTHONPATH=src python demo/ai_dialogue.py --backend mock` |
+| AI dialogue (real, needs Ollama) | `PYTHONPATH=src python demo/ai_dialogue.py --backend ollama` |
 | Amortization + figure | `PYTHONPATH=src python evals/amortization.py` (writes `evals/amortization.csv`, `paper/figures/amortization.png`) |
 | Blue Sky draft | `cd paper/bluesky && pdflatex main.tex` (twice) |
 | Journal manuscript | `cd paper/journal && pdflatex main.tex` (twice) |

@@ -32,6 +32,10 @@
   degrades gracefully when the `ggwave` package is absent.
 - **`agents.py`** — rule-based `CallerAgent` / `ReceptionistAgent`, `INVENTORY`,
   `ENGLISH_SCRIPT` (Act 1) vs `STRUCTURED_TASKS` (Act 2).
+- **`llm.py`** — real-AI integration: `LLMBackend` + `OllamaBackend` (local,
+  httpx only) + `MockBackend` (tests); `AgentCaller` plans validated/coerced
+  tasks and narrates results; `AgentReceptionist` speaks English, executes
+  deterministic tools. Switch is signal-driven (AI-mention) with timeout fallback.
 - **`audit.py`** — `AuditLog`: JSONL append + `human_transcript()` renderer.
 - **`metrics.py`** — `DialogueMetrics`: token/$/latency model with documented
   assumptions (chars/token, TTS/STT/LLM prices, ggwave goodput 32 Bps audible-fast).
