@@ -214,6 +214,8 @@ documented seeds.
 to end; measured sizes: handshake 463\,B one-time, HELLO $\sim$115\,B, WELCOME
 $\sim$128\,B, KEY $\sim$107--113\,B, all four TASK frames 117--139\,B compact (hotel and
 taxi domains), RESULT 126--139\,B --- every frame fits one ggwave transmission.
+Local compute is negligible next to airtime (full handshake 0.22\,ms,
+task seal/open $\sim$10--20\,$\mu$s measured).
 
 \emph{Attacks (Table~\ref{tab:threat}).} A keyless attacker is rejected
 (\texttt{InvalidTag}); exact replays are rejected (sequence reuse); legacy

@@ -69,6 +69,7 @@ PYTHONPATH=src python evals/amortization.py  # cost/time/bytes vs turns + figure
 PYTHONPATH=src:evals python evals/codec_profiles.py  # burst-profile sweep
 PYTHONPATH=src python evals/decoder_fragility.py  # negative result, documented
 PYTHONPATH=src python evals/mitm.py  # impostor break, documents the PKI gap
+PYTHONPATH=src python evals/perf.py  # CPU costs: handshake 0.22ms, tasks ~µs
 ```
 
 Expected output (measured on this machine):

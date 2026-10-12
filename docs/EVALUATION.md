@@ -31,6 +31,11 @@ byte count. Byte-compaction for tasks has landed (all task frames single-frame,
 Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 32 Bps audible-fast goodput). Tune and cite before submitting.
 
+CPU cost (measured, `evals/perf.py`, N=200): ephemeral keypair 0.06ms, full
+4-message handshake 0.22ms, seal 0.008ms, open 0.02ms, bloom build+query
+0.009ms, ticket derive 0.008ms. Compute is negligible next to airtime —
+the cost story's "ms of CPU" is really tens of microseconds.
+
 ## 3. Threat model (MVP scope)
 
 | Attack | Gibberlink (baseline) | SAPHIR v0.1 |
