@@ -3,8 +3,8 @@ title: "SAPHIR: Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous
 message: "If you use this software, please cite it as below."
 type: software
 authors:
-  - family-names: Rathod Vaibhav Vishwas Ram
-    given-names: Rathod Vaibhav Vishwas Ram
+  - family-names: Rathod
+    given-names: Vaibhav Vishwas Ram
     affiliation: "Department of Computer Science and Engineering, R. V. College of Engineering, Bengaluru, India"
 version: 0.1.0
 date-released: 2026-10-11

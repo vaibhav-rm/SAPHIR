@@ -150,5 +150,5 @@ docs/              PROTOCOL / ARCHITECTURE / EVALUATION
 
 ## License
 
-MIT (same as Gibberlink/ggwave lineage). See `LICENSE` when added.
+MIT © 2026 Vaibhav Rathod — see `LICENSE` (if you use this work, cite it via `CITATION.cff`).
 Research prototype — not audited for production use.
