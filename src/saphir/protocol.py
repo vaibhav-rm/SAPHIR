@@ -101,8 +101,9 @@ def decode_envelope(buf: bytes) -> tuple[Envelope, bytes]:
 def build_hello(agent_id: str, did: str, seq: int = 0) -> Envelope:
     # Compact: agent_id == envelope sender (not repeated), no duplicate nonce
     # (the envelope nonce covers freshness), int codec/mode codebooks, int ts.
+    # 8B envelope nonce: handshake freshness only (AEAD mints its own 12B).
     return Envelope(type=MsgType.HELLO, seq=seq, sender=agent_id,
-                    nonce=os.urandom(16),
+                    nonce=os.urandom(8),
                     payload={"did": did, "codec": [CODEC_NAMES["saphir-cbor-v1"]],
                              "modes": DEFAULT_MODES, "ts": int(time.time())})
 

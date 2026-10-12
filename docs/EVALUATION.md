@@ -15,7 +15,7 @@ PYTHONPATH=src python evals/attacks.py
 | Metric | Value |
 |---|---|
 | English dialogue | 214 chars (~54 tokens) |
-| SAPHIR handshake (one-time) | 463 B |
+| SAPHIR handshake (one-time) | 459 B |
 | SAPHIR tasks (2 intents + 2 results, compact encoding) | 494 B (tasks alone 248 B) |
 | TASK hotel.check / hotel.book wire size | 117 B / 131 B (was 182/202 B full-form) |
 | TASK taxi.request / taxi.book wire size | 128 B / 139 B (non-default ontology) |
@@ -83,7 +83,7 @@ exhaustion (bounded budget), not integrity failures. Repro:
 
 ## 6. Amortization (measured bytes, modeled cost/time; `evals/amortization.py`)
 
-One 463B handshake (measured), then rotating check/book turns (mean 246B wire
+One 459B handshake (measured), then rotating check/book turns (mean 246B wire
 per TASK+RESULT pair, measured). English baseline: 53.5 chars/turn (measured
 from the dialogue script) sent as raw text-over-tones + full STT→LLM→TTS per
 turn (modeled in `metrics.py`). SAPHIR turns cost nominal CPU only (stated
@@ -148,3 +148,17 @@ the Python and WASM builds, while real streaming over-air exchange works —
 so in-process SNR sweeps would measure harness artifacts, not the channel.
 Consequences applied: loss models stay byte-level and labeled as such;
 demo retry is load-bearing; true room validation needs real rooms.
+
+## 10. Capability discovery (`src/saphir/caps.py`, `tests/test_caps.py`)
+
+HELLO carries the initiator's need plus either side's offers: a 1-byte exact
+bitmask over the registered intents and a 10-byte bloom filter for open
+vocabularies. Cost: HELLO 107B bare / 113B with need / 130B with offers —
+still single-frame. Measured bloom FPR with 4 inserted capabilities: 5/2000
+= 0.25% (theory ≈0.27%). Matching is three-valued: `exact` (bit set),
+`maybe` (bloom hit only — earns a TASK attempt, never execution), `no`
+(definite absence — responder's WELCOME verdict lets the caller decline fast;
+a stray post-handshake TASK gets a plaintext `ERROR/no-capability`).
+Verified flows: exact match, fast decline (`taxi.book` vs hotel-only host),
+and maybe-confirm for unregistered (`photos.print`) capabilities.
+Repro: `PYTHONPATH=src:evals python -m pytest tests/test_caps.py -q`.

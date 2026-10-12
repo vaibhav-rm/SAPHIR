@@ -39,9 +39,19 @@ def _fresh_did(agent_id: str) -> str:
 
 
 class SaphirSession:
-    def __init__(self, agent_id: str, did: str | None = None):
+    def __init__(self, agent_id: str, did: str | None = None,
+                 offers=(), need: str | None = None):
+        from .caps import offered_bitmask, BloomFilter
         self.agent_id = agent_id
         self.did = did or _fresh_did(agent_id)
+        self.offers = tuple(offers)
+        self.need = need
+        self.have_mask = offered_bitmask(self.offers)
+        self.bloom = BloomFilter()
+        for it in self.offers:
+            self.bloom.add(it)
+        self.verdict = None      # caller's view of responder's WELCOME verdict
+        self.peer_need = None    # responder's view of caller's need
         self.state = SessionState.IDLE
         self.seq = 0
         self.peer = PeerInfo()
@@ -54,24 +64,37 @@ class SaphirSession:
     # ---- handshake initiators ----
     def hello(self) -> Envelope:
         from .protocol import build_hello
+        from .caps import INTENT_IDS
         env = build_hello(self.agent_id, self.did, self.seq)
+        if self.need:  # int id if registered, else the raw string (open vocab)
+            env.payload["need"] = INTENT_IDS.get(self.need, self.need)
+        if self.have_mask:  # omit empties: absence == none offered
+            env.payload["have"] = self.have_mask
+            if any(self.bloom.bits):
+                env.payload["bloom"] = self.bloom.wire()
         self.seq += 1
         self.state = SessionState.HELLO_SENT
         return env
 
     def handle_hello(self, env: Envelope) -> Envelope:
         from .protocol import normalize_codecs
+        from .caps import INTENT_NAMES, match
         p = env.payload
         if not isinstance(p, dict) or "did" not in p:
             raise HandshakeError("malformed HELLO")
         self.peer = PeerInfo(agent_id=p.get("agent_id", env.sender), did=p["did"],
                              codecs=normalize_codecs(p.get("codec", p.get("codecs", []))))
-        # answer WELCOME (echo our did + selected codec)
+        raw_need = p.get("need", 0)
+        self.peer_need = INTENT_NAMES.get(raw_need, raw_need) if raw_need else None
+        verdict = match(self.peer_need, self.have_mask, self.bloom) if self.peer_need else "exact"
+        # answer WELCOME (echo our did + selected codec + capability verdict)
         self.state = SessionState.HELLO_SENT
+        code = {"exact": 2, "maybe": 1, "no": 0}[verdict]
         return Envelope(type=MsgType.WELCOME, seq=self.seq, sender=self.agent_id,
                         nonce=os.urandom(16),
-                        payload={"did": self.did, "codec": [1],
-                                 "sel": 1, "modes": 3, "ts": int(time.time())})
+                        payload={"did": self.did, "sel": 1, "modes": 3,
+                                 "for": p.get("need", 0), "match": code,
+                                 "ts": int(time.time())})
 
     def handle_welcome(self, env: Envelope) -> Envelope:
         from .protocol import normalize_selected
@@ -81,6 +104,7 @@ class SaphirSession:
             self.peer.agent_id = env.sender
         self.selected_codec = normalize_selected(p.get("sel", p.get("selected")),
                                                  self.selected_codec)
+        self.verdict = {2: "exact", 1: "maybe", 0: "no"}.get(p.get("match", 2), "exact")
         key1 = Envelope(type=MsgType.KEY1, seq=self.seq, sender=self.agent_id,
                         nonce=os.urandom(16), payload={"pub": self._kp.pub_bytes})
         self.seq += 1
@@ -136,6 +160,14 @@ class SaphirSession:
 
     def open_result(self, env: Envelope) -> dict:
         return self.open_task(env)  # same AEAD path
+
+    def refuse(self, intent: str) -> Envelope:
+        """Polite decline for a TASK nobody offered: plaintext ERROR frame."""
+        env = Envelope(type=MsgType.ERROR, seq=self.seq, sender=self.agent_id,
+                       nonce=os.urandom(12),
+                       payload={"code": "no-capability", "want": intent})
+        self.seq += 1
+        return env
 
 
 def Peerinfo_fix(p: dict) -> PeerInfo:

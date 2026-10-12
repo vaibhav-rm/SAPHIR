@@ -8,6 +8,7 @@ from .protocol import (
 )
 from .crypto import EphemeralKeypair, SessionKeys, derive_session_keys
 from .codec import compact_task, expand_task
+from .caps import BloomFilter, match, offered_bitmask, INTENT_IDS, INTENT_NAMES
 from .session import SaphirSession, SessionState, HandshakeError
 from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats,
                       BurstChannel, ChannelProfile, PROFILES)
@@ -23,6 +24,7 @@ __all__ = [
     "normalize_codecs", "normalize_selected", "EphemeralKeypair", "SessionKeys", "derive_session_keys",
     "SaphirSession", "SessionState", "HandshakeError",
     "compact_task", "expand_task",
+    "BloomFilter", "match", "offered_bitmask", "INTENT_IDS", "INTENT_NAMES",
     "InMemoryChannel", "LossyChannel", "ChannelStats",
     "ReliableLink", "LinkStats",
     "BurstChannel", "ChannelProfile", "PROFILES",

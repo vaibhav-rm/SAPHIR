@@ -152,7 +152,10 @@ traffic-analysis resistance, and denial-of-service on the acoustic medium.
 \textbf{Framing.} Length-prefixed CBOR envelopes,
 \texttt{u32be len $\parallel$ CBOR(\{v,type,seq,sender,nonce,payload\})}, cap
 200\,B (enforced). \textbf{Handshake.} HELLO (ephemeral \texttt{did:key},
-codec/mode lists) $\to$ WELCOME (selected codec; peers offering no SAPHIR
+integer codec/mode codebooks, plus capability advertisements: the initiator's
+\texttt{need} and the sender's \texttt{have} bitmask over registered intents
+with a 10\,B bloom filter for open vocabularies) $\to$ WELCOME (selected codec
+plus an \texttt{exact/maybe/no} capability verdict; peers offering no SAPHIR
 codec are flagged and kept in English) $\to$ KEY1/KEY2 (32\,B X25519 ephemeral
 pubkeys each way; HKDF-SHA256 derives a 32\,B ChaCha20-Poly1305 session key;
 forward secrecy per pairing). \textbf{Messaging.} TASK/RESULT carry
@@ -251,7 +254,11 @@ Cell & Raw & ARQ & Median retries (ARQ) \\
 \end{tabular}
 \end{table}
 
-\emph{Codec/noise profiles (byte-level burst models, 20 trials):}
+\emph{Capability discovery:} three-valued matching over $\sim$13\,B of HELLO
+(exact bit, bloom \texttt{maybe} at 0.25\% measured FPR, fast \texttt{no} with
+a plaintext decline) --- preliminary evidence that capability semantics fit
+the acoustic budget; schema-driven open vocabularies remain future work. \emph{Codec/noise
+profiles (byte-level burst models, 20 trials):}
 clean 100\%, cafe-noise 95\%, bursty VoIP-like 95\%, harsh narrowband 80\% ---
 bounding the design's operating envelope; waveform/over-air measurement is
 explicitly future work. \emph{Amortization (Fig.~\ref{fig:amort}):} the 463\,B
