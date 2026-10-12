@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, "src")
-from saphir import (SaphirSession, TicketStore, ReceptionistAgent,
+from saphir import (SaphirSession, TicketStore, LocalLink, ReceptionistAgent,
                     encode_envelope, decode_envelope)
 
 DID_C, DID_R = "did:key:zcaller-stable", "did:key:zrecep-stable"
@@ -11,13 +11,7 @@ def full_pairing(store_c=None, store_r=None):
                       need="hotel.book", offers=[])
     b = SaphirSession("receptionist", did=DID_R, store=store_r,
                       offers=["hotel.check", "hotel.book"])
-    frames = []
-    h = a.hello(); frames.append(h)
-    w = b.handle_hello(decode_envelope(encode_envelope(h))[0]); frames.append(w)
-    k1 = a.handle_welcome(w); frames.append(k1)
-    k2 = b.handle_key1(decode_envelope(encode_envelope(k1))[0]); frames.append(k2)
-    a.handle_key2(decode_envelope(encode_envelope(k2))[0])
-    nbytes = sum(len(encode_envelope(f)) for f in frames)
+    nbytes = LocalLink(a, b).handshake()
     return a, b, nbytes
 
 

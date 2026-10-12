@@ -1,18 +1,14 @@
 """Attack checks: replay, spoof/forgery, downgrade. Exit nonzero on failure."""
 import sys
 sys.path.insert(0, "src")
-from saphir import SaphirSession, InMemoryChannel, encode_envelope, decode_envelope
+from saphir import SaphirSession, LocalLink, encode_envelope, decode_envelope
 
 
 def handshake():
     a, b = SaphirSession("caller"), SaphirSession("receptionist")
-    ab, ba = InMemoryChannel(), InMemoryChannel()
-    h = a.hello(); ab.send(encode_envelope(h))
-    e, _ = decode_envelope(ab.recv()); w = b.handle_hello(e); ba.send(encode_envelope(w))
-    e, _ = decode_envelope(ba.recv()); k1 = a.handle_welcome(e); ab.send(encode_envelope(k1))
-    e, _ = decode_envelope(ab.recv()); k2 = b.handle_key1(e); ba.send(encode_envelope(k2))
-    e, _ = decode_envelope(ba.recv()); a.handle_key2(e)
-    return a, b, ab, ba
+    link = LocalLink(a, b)
+    link.handshake()
+    return a, b, link.ab, link.ba
 
 
 def test_replay_rejected():

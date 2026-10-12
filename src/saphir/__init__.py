@@ -13,6 +13,7 @@ from .resume import TicketStore, Ticket, ticket_id, ticket_from_shared, resumed_
 from .session import SaphirSession, SessionState, HandshakeError
 from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats,
                       BurstChannel, ChannelProfile, PROFILES)
+from .link import LocalLink, LinkError
 from .audit import AuditLog
 from .agents import CallerAgent, ReceptionistAgent, run_booking_dialogue
 from .agents import TaxiDispatch, TAXI_TASKS, TAXI_FLEET
@@ -31,6 +32,7 @@ __all__ = [
     "InMemoryChannel", "LossyChannel", "ChannelStats",
     "ReliableLink", "LinkStats",
     "BurstChannel", "ChannelProfile", "PROFILES",
+    "LocalLink", "LinkError",
     "AuditLog", "CallerAgent", "ReceptionistAgent", "run_booking_dialogue",
     "TaxiDispatch", "TAXI_TASKS", "TAXI_FLEET",
 ]

@@ -19,8 +19,12 @@
 - **`protocol.py`** — `Envelope` dataclass, `MsgType` enum, CBOR encode/decode with
   `u32be` length prefix, `MAX_MSG_BYTES` enforcement, `build_hello` / `build_task`.
 - **`session.py`** — `SaphirSession` state machine
-  (`IDLE → HELLO_SENT → KEY_SENT → ESTABLISHED → CLOSED`), `HandshakeError`,
-  `seal_task/open_task/seal_result/open_result`.
+  (`IDLE → HELLO_SENT → KEY_SENT → ESTABLISHED → CLOSED`, plus `RESUMING`
+  for ticketed return visits), `HandshakeError`,
+  `seal_task/open_task/seal_result/open_result` (+ `refuse`).
+- **`link.py`** — `LocalLink` pairing API: `handshake()` (peer-DID hints
+  automatic, resumption aware, returns wire bytes) + `task()` (one encrypted
+  roundtrip via a handler). Used by `evals/attacks.py` and resume tests.
 - **`crypto.py`** — `EphemeralKeypair` (X25519), `derive_session_keys` (HKDF-SHA256),
   `SessionKeys.seal/open` (ChaCha20Poly1305 + replay set). Deliberately not full MLS.
 - **`channel.py`** — `InMemoryChannel` (FIFO, default), `LossyChannel` wrapper
