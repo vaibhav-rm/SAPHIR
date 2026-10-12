@@ -142,10 +142,22 @@ docs/              PROTOCOL / ARCHITECTURE / EVALUATION
 ## Roadmap
 
 - [x] Weeks 1–2: baseline (ggwave framing + booking task + metrics)
-- [x] Weeks 3–4: handshake + crypto + audit + CLI demo (this release, `v0.1.0`)
-- [ ] Weeks 5–6: browser demo (WebRTC + spectrogram) + lossy-channel sweep
-- [ ] Weeks 7–8: 4-page workshop paper (NeurIPS AABA4ET / TAAI 2026) + arXiv
-- Future: real ggwave-over-air tests, compact slot encoding, DID PKI, MLS groups
+- [x] Weeks 3–4: handshake + crypto + audit + CLI demo
+- [x] Weeks 5–6: browser demo + lossy-channel sweeps — done and exceeded:
+  real-ggwave two-device demo (`demo/web/`), raw/ARQ/burst-profile sweeps
+  (`robustness.py`, `reliability.py`, `codec_profiles.py`). No WebRTC needed
+  (data rides sound); spectrogram simplified to a live wave + audit log.
+- [x] Weeks 7–8: paper — pivoted per author constraint (no travel) from
+  workshops to the journal track: 6-page JAAMAS manuscript (`paper/journal/`)
+  + Blue Sky sketch + submission mechanics in `docs/publication-plan.md`.
+  arXiv upload is an author action (needs your account), not a code task.
+- [x] Future, completed: real ggwave-over-air path (vendored WASM, live mic
+  decode, in-process roundtrips), compact slot/value encoding (all frames
+  single-frame), capability discovery, resumption, AI-agent integration.
+- [ ] Future, genuinely open (need hardware / new research / you):
+  real-room measurements, DID PKI (break demonstrated in `evals/mitm.py`),
+  MLS groups, schema-driven capability dictionaries, sidecar selective
+  disclosure, third-party security audit, arXiv + JAAMAS submission.
 
 ## References
 
