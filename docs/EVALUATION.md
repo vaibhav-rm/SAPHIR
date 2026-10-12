@@ -40,6 +40,7 @@ Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
 | Forced downgrade to beeps | ✅ silent | ❌ flagged, stays in English |
 | Eavesdropping on audio | ✅ plaintext | ❌ ciphertext |
 | Attacker *with* stolen session keys | n/a | ⚠️ out of scope (needs PKI rotation — future work) |
+| Impostor responder (own keys, full pairing) | ✅ pairs + reads tasks, zero signal | ⚠️ demonstrated in `evals/mitm.py`; fix = PKI-bound DIDs |
 | Traffic analysis (who talks) | n/a | ⚠️ out of scope (see Dangol 2026) |
 
 ## 4. Robustness (measured, `evals/robustness.py`, 50 trials/cell, no retransmission)
@@ -149,7 +150,16 @@ so in-process SNR sweeps would measure harness artifacts, not the channel.
 Consequences applied: loss models stay byte-level and labeled as such;
 demo retry is load-bearing; true room validation needs real rooms.
 
-## 10. Capability discovery (`src/saphir/caps.py`, `tests/test_caps.py`)
+## 10. Impostor responder (`evals/mitm.py`, expected-insecure)
+
+An impostor offering the same capabilities completes the identical handshake,
+reaches ESTABLISHED with verdict `exact`, decrypts the booking TASK, and
+answers convincingly — the caller sees no distinguishing signal. This is the
+PKI gap made runnable: the future PKI upgrade's regression test must flip this
+demo from "MITM DEMONSTRATED" to blocked. Repro:
+`PYTHONPATH=src python evals/mitm.py`.
+
+## 11. Capability discovery (`src/saphir/caps.py`, `tests/test_caps.py`)
 
 HELLO carries the initiator's need plus either side's offers: a 1-byte exact
 bitmask over the registered intents and a 10-byte bloom filter for open
