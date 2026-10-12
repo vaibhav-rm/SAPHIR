@@ -26,3 +26,21 @@ Constraint: **no conference travel.** So the path is journal + preprint, not ven
 - [x] Decoder characterization (single-shot fragility documented; §9 — real rooms still future)
 - [x] Expanded related work (full survey table, not just the Blue Sky paragraph)
 - [x] Reproducibility appendix (commands, seeds, artifact link)
+
+## Submission mechanics (for the author, when ready)
+
+- Format: Springer Nature LaTeX template (`sn-jnl`, `pdflatex,sn-basic,referee`
+  options). Easiest path: paste `paper/journal/main.tex` body into the
+  Overleaf SN template (30–60 min); the class file could not be vendored here,
+  and Editorial Manager validates on upload anyway. Keep `thebibliography` or
+  convert to a `.bib` — both accepted with `sn-basic`.
+- Required Declarations block (Springer standard, draft text ready to paste):
+  - Funding: no funding was received for this work.
+  - Competing interests: the author declares no competing interests.
+  - Data availability: code, harnesses, and demo at
+    https://github.com/vaibhav-rm/SAPHIR; every number reproduces from
+    `docs/REPRODUCIBILITY.md`.
+  - Author contributions: single-author work.
+  - Ethics approval: not applicable (no human subjects, no personal data).
+- License: repo is MIT (`LICENSE`); artifact runs without accounts, keys, or hardware.
+- Cite-as: `CITATION.cff` at repo root (GitHub renders it automatically).
