@@ -133,3 +133,18 @@ domain-specific value shorts. All four task frames across both domains fit the
 single-frame budget (117/131/128/139 B). Test: `tests/test_domains.py`.
 Dictionary coding is demo-scale by design; schema-driven dictionaries
 negotiated in HELLO are the scalable version (manuscript RQ).
+
+## 9. Decoder characterization (negative result, `evals/decoder_fragility.py`)
+
+| case | input | result | meaning |
+|---|---|---|---|
+| clean whole-buffer | int16 direct | PASS | baseline |
+| +quantization | int16 via f32 | PASS | LSB churn ok |
+| rescaled 0.5x | int16 | FAIL | marker keys on absolute level |
+| +40dB AWGN | int16 | FAIL | single-shot fragile |
+
+Perturbed waveforms fed single-shot in-process fail deterministically in both
+the Python and WASM builds, while real streaming over-air exchange works —
+so in-process SNR sweeps would measure harness artifacts, not the channel.
+Consequences applied: loss models stay byte-level and labeled as such;
+demo retry is load-bearing; true room validation needs real rooms.

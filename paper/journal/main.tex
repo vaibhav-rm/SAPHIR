@@ -272,10 +272,11 @@ raw-text-over-tones (structure plus auth tags), shown, not hidden.
 (1) No room-acoustics validation yet --- loss models are byte-level, though all
 framing now round-trips through the real ggwave implementation in-process and a
 browser demo drives genuine over-air exchange; Opus/G.711 traces and measured
-rooms are the next experiment. A learned lesson belongs here: the ggwave
+rooms are the next experiment. Two learned lessons belong here: the ggwave
 implementation shows content-dependent first-try decode misses, so retries must
-re-seal with fresh randomness rather than retransmit identical bytes --- our
-demo does exactly this. (2) Identity
+re-seal with fresh randomness rather than retransmit identical bytes; and
+single-shot in-process decoding is fragile to any perturbation (both builds),
+which is why loss is modeled at the byte level and retry is load-bearing. (2) Identity
 is ephemeral, not PKI-backed; upgrading the HELLO to verifiable credentials
 (where IP exists) is designed but unbuilt. Hand dictionaries are demo-scale;
 schema-driven dictionaries negotiated in HELLO are the scalable compression

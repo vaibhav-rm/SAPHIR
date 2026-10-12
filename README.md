@@ -67,6 +67,7 @@ PYTHONPATH=src python evals/robustness.py
 PYTHONPATH=src python evals/reliability.py   # ARQ vs raw comparison
 PYTHONPATH=src python evals/amortization.py  # cost/time/bytes vs turns + figure
 PYTHONPATH=src:evals python evals/codec_profiles.py  # burst-profile sweep
+PYTHONPATH=src python evals/decoder_fragility.py  # negative result, documented
 ```
 
 Expected output (measured on this machine):

@@ -18,6 +18,7 @@ Artifact: \url{https://github.com/vaibhav-rm/SAPHIR} (MIT, research prototype).
 | Raw robustness sweep | `PYTHONPATH=src python evals/robustness.py` |
 | ARQ reliability sweep | `PYTHONPATH=src python evals/reliability.py` |
 | Codec/noise profiles | `PYTHONPATH=src:evals python evals/codec_profiles.py` |
+| Decoder characterization | `PYTHONPATH=src python evals/decoder_fragility.py` |
 | Amortization + figure | `PYTHONPATH=src python evals/amortization.py` (writes `evals/amortization.csv`, `paper/figures/amortization.png`) |
 | Blue Sky draft | `cd paper/bluesky && pdflatex main.tex` (twice) |
 | Journal manuscript | `cd paper/journal && pdflatex main.tex` (twice) |
