@@ -1,0 +1,24 @@
+:root { --bg: #0c0e12; --fg: #e8eaf0; --muted: #9aa3b2; --accent: #6cb8ff; --card: #141821; --line: #232a38; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+a { color: var(--accent); }
+.hero { padding: 3.5rem 1.25rem 2rem; text-align: center; border-bottom: 1px solid var(--line); }
+.kicker { color: var(--muted); margin: 0 0 .5rem; font-size: .9rem; }
+h1 { font-size: 3rem; letter-spacing: .35em; margin: .25rem 0; text-indent: .35em; }
+.sub { color: var(--muted); max-width: 44rem; margin: 0 auto 1.25rem; }
+.cta { display: flex; gap: .6rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); border-radius: .5rem; padding: .55rem 1.1rem; text-decoration: none; color: var(--fg); background: var(--card); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #06121f; font-weight: 600; }
+.diagram { display: inline-block; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: .6rem; padding: 1rem 1.25rem; overflow-x: auto; max-width: 100%; font-size: .82rem; }
+main { max-width: 46rem; margin: 0 auto; padding: 1rem 1.25rem 3rem; }
+section { margin: 2.25rem 0; }
+h2 { border-bottom: 1px solid var(--line); padding-bottom: .4rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--card); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+pre { background: var(--card); border: 1px solid var(--line); border-radius: .6rem; padding: .9rem 1rem; overflow-x: auto; font-size: .82rem; }
+.checklist { list-style: none; padding: 0; }
+.checklist li { margin: .35rem 0; }
+.fine { color: var(--muted); font-size: .9rem; }
+footer { border-top: 1px solid var(--line); text-align: center; color: var(--muted); padding: 1.25rem; font-size: .9rem; }
