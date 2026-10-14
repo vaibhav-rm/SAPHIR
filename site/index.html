@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAPHIR — Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous</title>
+<meta name="description" content="SAPHIR: authenticated acoustic handshake (HELLO → WELCOME → KEY1 → KEY2) plus encrypted structured tasks, with a human-readable audit sidecar. Research prototype.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <p class="kicker">Research prototype · MIT · <a href="https://github.com/vaibhav-rm/SAPHIR">github.com/vaibhav-rm/SAPHIR</a></p>
+  <h1>SAPHIR</h1>
+  <p class="sub">Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous.<br>
+  From spoken dialogue to auditable structured collaboration over a low-bandwidth acoustic channel.</p>
+  <div class="cta">
+    <a class="btn primary" href="#demo">Run the demo</a>
+    <a class="btn" href="#docs">Read the docs</a>
+    <a class="btn" href="https://github.com/vaibhav-rm/SAPHIR">GitHub</a>
+  </div>
+<pre class="diagram">Caller (AI) ──English──▶ Receptionist (AI)     [Act 1: wasteful STT→LLM→TTS loop]
+      │ "you're AI? let's switch to SAPHIR"
+      ══ HELLO → WELCOME → KEY1 → KEY2 ══       [pairing, X25519 ephemeral]
+      ══ TASK ⇄ RESULT (CBOR + ChaCha20Poly1305) [Act 2: structured, ~100–200B/msg]
+      ✕ forged TASK rejected (InvalidTag)        [Act 3: attacker without keys]
+      ✕ replayed TASK rejected (seq reuse)
+      📜 sidecar audit log renders every beep human-readable</pre>
+</header>
+
+<main>
+<section id="why">
+  <h2>Why not just…</h2>
+  <table>
+    <tr><th>System</th><th>Channel</th><th>Auth</th><th>Negotiation</th><th>Auditability</th></tr>
+    <tr><td>Gibberlink (ggwave raw)</td><td>audio only</td><td>❌ prompt only</td><td>❌ hardcoded</td><td>❌ beeps are opaque</td></tr>
+    <tr><td>MCP / A2A / InterSAGE</td><td>HTTPS</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td><strong>SAPHIR (this repo)</strong></td><td><strong>audio / hybrid</strong></td><td>✅ ephemeral X25519</td><td>✅ codec select</td><td>✅ sidecar transcript</td></tr>
+  </table>
+  <p>MCP/A2A/InterSAGE assume IP + HTTPS. SAPHIR covers the gap they leave:
+  <strong>voice-only calls, PSTN-constrained trunks, offline / air-gapped rooms, noisy speakers.</strong></p>
+</section>
+
+<section id="protocol">
+  <h2>Protocol in 60 seconds</h2>
+  <ol>
+    <li><strong>HELLO</strong> A→B: agent id, ephemeral DID, codecs, modes, nonce, timestamp (plaintext)</li>
+    <li><strong>WELCOME</strong> B→A: same + selected codec. Legacy peers offering no <code>saphir-cbor-v1</code> are flagged — no silent downgrade to beeps.</li>
+    <li><strong>KEY1 / KEY2</strong>: 32B X25519 ephemeral pubkeys each way → <code>HKDF-SHA256 → 32B ChaCha20Poly1305</code> session key (forward secrecy per pairing).</li>
+    <li><strong>TASK / RESULT</strong>: <code>ChaCha(cbor({intent, slots, ontology, ts}))</code>, AAD binds sender, seq + nonce set rejects replays.</li>
+    <li><strong>Sidecar</strong>: every frame appended to JSONL with human summary + decrypted view.</li>
+  </ol>
+  <p>Frame: <code>u32be len ‖ CBOR({v, type, seq, sender, nonce, payload})</code>, cap 200B.
+  Measured: HELLO ~115B, WELCOME ~128B, KEY ~107–113B, TASK ~117–139B, RESULT ~126–139B — every frame fits one ggwave audible transmission.</p>
+</section>
+
+<section id="security">
+  <h2>Security properties (MVP)</h2>
+  <ul class="checklist">
+    <li>✅ Confidentiality + integrity for TASK/RESULT (AEAD, sender-bound AAD)</li>
+    <li>✅ Forward secrecy per pairing (ephemerals discarded)</li>
+    <li>✅ Replay rejection (seq window + nonce/ct set)</li>
+    <li>✅ Downgrade flagging (no beeps with legacy peers)</li>
+    <li>❌ <strong>Not yet:</strong> PKI-backed DID auth (break demonstrated in <code>evals/mitm.py</code>), MLS groups, ultrasound, DoS MAC — listed as future work.</li>
+  </ul>
+</section>
+
+<section id="numbers">
+  <h2>Measured numbers</h2>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Handshake (4 msgs, one-time)</td><td>459 B</td></tr>
+    <tr><td>TASK hotel.check / hotel.book</td><td>117 B / 131 B</td></tr>
+    <tr><td>Handshake CPU (N=200)</td><td>0.22 ms</td></tr>
+    <tr><td>Seal / open per task</td><td>~8 µs / ~20 µs (compute negligible vs airtime)</td></tr>
+    <tr><td>Attacks</td><td>forgery → InvalidTag · replay → seq-reuse · downgrade → flagged, stays in English</td></tr>
+  </table>
+  <p class="fine">Claim discipline: raw bytes are larger than English chars (CBOR + 16B auth tags + envelope).
+  The saving is <strong>neural compute</strong> — no TTS/STT/LLM passes per turn; tone decode is ms of CPU. See <code>docs/EVALUATION.md</code>.</p>
+</section>
+
+<section id="demo">
+  <h2>Try it</h2>
+  <h3>Web demo — real ggwave over air</h3>
+<pre>cd demo/web
+python3 -m http.server 8080
+# open http://localhost:8080              (role picker)
+# two devices: ?role=caller + ?role=receptionist</pre>
+  <p>Needs mic permission + localhost/HTTPS. Headless logic test: <code>node demo/web/smoke-test.mjs</code>.</p>
+  <h3>CLI demo (no audio hardware)</h3>
+<pre>pip install -r requirements.txt
+PYTHONPATH=src python demo/demo_cli.py</pre>
+  <h3>Tests &amp; evals</h3>
+<pre>PYTHONPATH=src python -m pytest tests/ -q
+PYTHONPATH=src python evals/bench.py
+PYTHONPATH=src python evals/attacks.py
+PYTHONPATH=src python evals/robustness.py</pre>
+</section>
+
+<section id="docs">
+  <h2>Docs</h2>
+  <ul>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/PROTOCOL.md">Wire spec (PROTOCOL.md)</a> — frame layout, message types, measured sizes</li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/ARCHITECTURE.md">Module design (ARCHITECTURE.md)</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/EVALUATION.md">Numbers + threat model (EVALUATION.md)</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/REPRODUCIBILITY.md">Reproducibility guide</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/IDENTITY.md">Identity / DID notes</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/demo/web/README.md">Web demo guide</a></li>
+  </ul>
+  <h3>Layout</h3>
+<pre>src/saphir/
+  protocol.py   CBOR envelope, framing, 200B cap
+  session.py    handshake state machine + AEAD messaging
+  crypto.py     X25519 + HKDF + ChaCha20Poly1305
+  channel.py    InMemory / Lossy(drop+corrupt) / ggwave probe
+  agents.py     hotel-booking toy task (English vs structured)
+  audit.py      JSONL sidecar log + human transcript
+  metrics.py    cost/latency model (assumptions documented)</pre>
+</section>
+
+<section id="status">
+  <h2>Project status</h2>
+  <p>Functionally complete per its roadmap: baseline, handshake + crypto + audit + CLI demo,
+  browser demo + lossy-channel sweeps, and the 6-page JAAMAS manuscript draft (<code>paper/journal/</code>) are done.
+  Genuinely open items need hardware / new research: real-room measurements, DID PKI, MLS groups,
+  schema-driven capability dictionaries, third-party audit, arXiv + JAAMAS submission (author actions).</p>
+  <p>Research prototype — not audited for production use. MIT © 2026 Vaibhav Rathod. Cite via <code>CITATION.cff</code>.</p>
+</section>
+</main>
+
+<footer>
+  <p>SAPHIR · <a href="https://github.com/vaibhav-rm/SAPHIR">GitHub</a> · MIT © 2026 Vaibhav Rathod</p>
+</footer>
+</body>
+</html>
