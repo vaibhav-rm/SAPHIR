@@ -41,7 +41,8 @@ def _fresh_did(agent_id: str) -> str:
 
 class SaphirSession:
     def __init__(self, agent_id: str, did: str | None = None,
-                 offers=(), need: str | None = None, store=None):
+                 offers=(), need: str | None = None, store=None,
+                 max_skew_s: float = 300, guard=None):
         from .caps import offered_bitmask, BloomFilter
         self.agent_id = agent_id
         self.did = did or _fresh_did(agent_id)
@@ -54,6 +55,8 @@ class SaphirSession:
         self.verdict = None      # caller's view of responder's WELCOME verdict
         self.peer_need = None    # responder's view of caller's need
         self.store = store       # TicketStore or None (explicit opt-in)
+        self.max_skew_s = max_skew_s  # HELLO freshness window (±s); None disables
+        self.guard = guard       # HandshakeGuard or None (responder-side flood gate)
         self._cr = None          # our client_random for the current resumption
         self._resumed_keys = None  # pending keys until first successful open
         self.state = SessionState.IDLE
@@ -91,9 +94,18 @@ class SaphirSession:
     def handle_hello(self, env: Envelope) -> Envelope:
         from .protocol import normalize_codecs
         from .caps import INTENT_NAMES, match
+        from .guard import is_fresh
         p = env.payload
         if not isinstance(p, dict) or "did" not in p:
             raise HandshakeError("malformed HELLO")
+        if self.guard is not None and not self.guard.allow(env.sender):
+            raise HandshakeError("hello rate-limited: back off")
+        if self.max_skew_s is not None and "ts" in p:
+            try:
+                if not is_fresh(p["ts"], self.max_skew_s):
+                    raise HandshakeError("stale HELLO: ts outside freshness window")
+            except (TypeError, ValueError):
+                raise HandshakeError("malformed HELLO ts")
         self.peer = PeerInfo(agent_id=p.get("agent_id", env.sender), did=p["did"],
                              codecs=normalize_codecs(p.get("codec", p.get("codecs", []))))
         raw_need = p.get("need", 0)
@@ -229,6 +241,21 @@ class SaphirSession:
                        payload={"code": "no-capability", "want": intent})
         self.seq += 1
         return env
+
+    def close(self) -> Envelope:
+        """Graceful teardown: plaintext BYE, session moves to CLOSED."""
+        env = Envelope(type=MsgType.BYE, seq=self.seq, sender=self.agent_id,
+                       nonce=os.urandom(8), payload={"bye": True})
+        self.seq += 1
+        self.state = SessionState.CLOSED
+        return env
+
+    def handle_bye(self, env: Envelope) -> None:
+        """Peer-initiated teardown: any well-formed BYE closes the session."""
+        if env.type != MsgType.BYE:
+            raise HandshakeError("not a BYE frame")
+        self.state = SessionState.CLOSED
+        return None
 
 
 def Peerinfo_fix(p: dict) -> PeerInfo:

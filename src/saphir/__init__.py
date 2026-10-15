@@ -13,6 +13,7 @@ from .resume import TicketStore, Ticket, ticket_id, ticket_from_shared, resumed_
 from .llm import (LLMBackend, MockBackend, OllamaBackend, AgentCaller,
                   AgentReceptionist, extract_json, coerce_plan)
 from .session import SaphirSession, SessionState, HandshakeError
+from .guard import HandshakeGuard, is_fresh, hello_age_s
 from .channel import (InMemoryChannel, LossyChannel, ChannelStats, ReliableLink, LinkStats,
                       BurstChannel, ChannelProfile, PROFILES)
 from .link import LocalLink, LinkError
@@ -28,6 +29,7 @@ __all__ = [
     "normalize_codecs", "normalize_selected",     "EphemeralKeypair", "SessionKeys", "derive_session_keys",
     "exchange", "keys_from_shared",
     "SaphirSession", "SessionState", "HandshakeError",
+    "HandshakeGuard", "is_fresh", "hello_age_s",
     "compact_task", "expand_task",
     "BloomFilter", "match", "offered_bitmask", "INTENT_IDS", "INTENT_NAMES",
     "TicketStore", "Ticket", "ticket_id", "ticket_from_shared", "resumed_keys",

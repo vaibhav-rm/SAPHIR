@@ -194,7 +194,6 @@ expiry-forced full handshake, and keyless-attacker rejection verified.
 Repro: `PYTHONPATH=src:evals python -m pytest tests/test_resume.py -q`.
 
 ## 13. Real-AI integration (`src/saphir/llm.py`, `demo/ai_dialogue.py`)
-
 Two qwen2.5:1.5b instances (local Ollama, temperature 0) hold the English
 opening, then pair and transact over SAPHIR — measured end run: switch on
 timeout (small model skipped the AI-mention), exact-verdict pairing in 465B,
@@ -205,3 +204,13 @@ inventory stays deterministic (LLM plans and narrates, never touches state).
 Mock-backed tests (`tests/test_llm.py`) cover coercion hardening, both switch
 paths, and the full dialogue with zero inference. Repro (needs Ollama):
 `PYTHONPATH=src python demo/ai_dialogue.py --backend ollama`.
+
+## 14. Handshake admission guard (`src/saphir/guard.py`, `tests/test_guard.py`)
+
+Plaintext HELLOs are cheap to forge, so responders now enforce two
+front-door policies (both opt-in, zero wire-format change): HELLO
+freshness (±300 s default, `max_skew_s=None` disables) rejects replayed
+stale/future captures before any crypto, and `HandshakeGuard`
+(per-sender token bucket, default 5 HELLOs/60 s) refuses floods before
+key agreement. Graceful `close()`/`handle_bye()` moves both sides to
+CLOSED. Repro: `PYTHONPATH=src python -m pytest tests/test_guard.py -q`.
