@@ -24,6 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          # Auto-provision the Pages site on first run. Without this the
+          # action fails with "Get Pages site failed ... Not Found" on repos
+          # where Pages was never enabled, even if Settings > Pages says
+          # "Deploy from GitHub Actions".
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
