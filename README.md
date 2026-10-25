@@ -1,6 +1,6 @@
 # SAPHIR — Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous
 
-> From spoken dialogue to auditable structured collaboration over a low-bandwidth acoustic channel.
+> From spoken dialogue to auditable structured collaboration over a low-bandwidth acoustic channel medium.
 
 Voice AI agents today talk to each other the wasteful way: `speech → text → LLM → speech`,
 even when both sides are machines. [Gibberlink](https://github.com/PennyroyalTea/gibberlink)
