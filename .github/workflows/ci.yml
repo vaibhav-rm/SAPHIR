@@ -15,4 +15,5 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements.txt
       - run: PYTHONPATH=src python -m pytest tests/ -q
+      - run: PYTHONPATH=src python -m saphir.harness demo
       - run: PYTHONPATH=src python evals/attacks.py
