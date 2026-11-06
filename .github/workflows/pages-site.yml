@@ -1,9 +1,13 @@
-name: Deploy GitHub Pages site
+name: Deploy docs site
 
 on:
   push:
     branches: [main]
-    paths: ["site/**", ".github/workflows/pages-site.yml"]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - ".github/workflows/pages-site.yml"
   workflow_dispatch:
 
 permissions:
@@ -16,22 +20,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+      - run: pip install -r requirements-docs.txt
+      - run: mkdocs build --strict
+      - uses: actions/configure-pages@v5
+        with:
+          # Auto-provision Pages on first run; otherwise deploy-pages fails on
+          # repositories where Pages was never enabled.
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
   deploy:
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        with:
-          # Auto-provision the Pages site on first run. Without this the
-          # action fails with "Get Pages site failed ... Not Found" on repos
-          # where Pages was never enabled, even if Settings > Pages says
-          # "Deploy from GitHub Actions".
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
       - id: deployment
         uses: actions/deploy-pages@v4

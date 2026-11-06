@@ -12,6 +12,8 @@ no audit trail**. Anyone with a speaker can spoof it.
 (`HELLO → WELCOME → KEY1 → KEY2`) followed by encrypted structured tasks
 (`TASK ↔ RESULT`), plus a human-readable sidecar log so every beep stays inspectable.
 
+> **Documentation site:** <https://vaibhav-rm.github.io/SAPHIR/> — quickstart, wire format, evaluation, local-AI harness, and FAQ.
+
 ```
 Caller (AI) ──English──▶ Receptionist (AI)     [Act 1: wasteful STT→LLM→TTS loop]
       │ "you're AI? let's switch to SAPHIR"

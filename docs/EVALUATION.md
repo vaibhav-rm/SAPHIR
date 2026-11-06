@@ -3,7 +3,7 @@
 ## 1. Functionality (all passing)
 
 ```
-PYTHONPATH=src python -m pytest tests/ -q        # 3 passed
+PYTHONPATH=src python -m pytest tests/ -q        # 60 passed
 PYTHONPATH=src python evals/attacks.py
 # [PASS] replay: replay rejected (seq reused)
 # [PASS] forgery: forgery rejected (InvalidTag)
@@ -109,7 +109,10 @@ turns)** — that, plus determinism and security, is the claimed win.
 **Wall-clock is deliberately not claimed**: narrowband audio moves fewer
 bytes/sec than speech, so SAPHIR trades time for near-zero neural compute.
 Wire bytes stay above raw-text-over-tones (structure + auth tags cost);
-Figure `paper/figures/amortization.png` plots both panels side by side.
+the figure plots both panels side by side.
+
+![Cumulative modeled cost and measured wire bytes over 20 dialogue turns](assets/amortization.png)
+
 Repro: `PYTHONPATH=src python evals/amortization.py` (writes CSV + figure).
 
 ## 7. Codec/noise profiles (byte-level models; `evals/codec_profiles.py`, 20 trials/cell)

@@ -7,3 +7,6 @@ logs/*.jsonl
 *.aux
 *.log
 *.out
+
+# MkDocs build output
+/site/

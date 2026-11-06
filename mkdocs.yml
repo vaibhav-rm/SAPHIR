@@ -1,0 +1,105 @@
+site_name: SAPHIR
+site_description: Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous — an authenticated, auditable protocol for AI agents on a voice-only channel.
+site_url: https://vaibhav-rm.github.io/SAPHIR/
+site_author: Vaibhav Rathod
+repo_url: https://github.com/vaibhav-rm/SAPHIR
+repo_name: vaibhav-rm/SAPHIR
+edit_uri: edit/main/docs/
+copyright: MIT © 2026 Vaibhav Rathod · Research prototype
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - content.action.edit
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+
+plugins:
+  - search
+
+exclude_docs: |
+  paper-outline.md
+  publication-plan.md
+
+nav:
+  - Home: index.md
+  - Get started:
+      - Quickstart: quickstart.md
+      - Demos: DEMO.md
+      - Reproducibility: REPRODUCIBILITY.md
+  - Protocol:
+      - Wire format: PROTOCOL.md
+      - Architecture: ARCHITECTURE.md
+      - Identity: IDENTITY.md
+  - Security:
+      - Evaluation & threat model: EVALUATION.md
+      - Novelty & prior art: NOVELTY.md
+  - Local-AI harness: HARNESS.md
+  - Project:
+      - Status & roadmap: STATUS.md
+      - FAQ: FAQ.md

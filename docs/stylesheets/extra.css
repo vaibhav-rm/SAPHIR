@@ -1,0 +1,709 @@
+/* ==========================================================================
+   SAPHIR docs — brand layer on top of Material for MkDocs
+   ========================================================================== */
+
+:root {
+  --saphir-accent: #0e7490;
+  --saphir-accent-2: #0f766e;
+  --saphir-accent-contrast: #ffffff;
+  --saphir-card: #ffffff;
+  --saphir-card-2: #f8fafc;
+  --saphir-border: #e2e8f0;
+  --saphir-muted: #526071;
+  --saphir-grid: rgba(15, 23, 42, 0.055);
+  --saphir-glow: rgba(14, 116, 144, 0.16);
+  --md-accent-fg-color: var(--saphir-accent);
+  --md-accent-fg-color--transparent: rgba(14, 116, 144, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --saphir-accent: #22d3ee;
+  --saphir-accent-2: #2dd4bf;
+  --saphir-accent-contrast: #04121a;
+  --saphir-card: #111a2c;
+  --saphir-card-2: #0e1626;
+  --saphir-border: #1f2a3d;
+  --saphir-muted: #94a3b8;
+  --saphir-grid: rgba(148, 163, 184, 0.08);
+  --saphir-glow: rgba(34, 211, 238, 0.18);
+  --md-accent-fg-color: var(--saphir-accent);
+  --md-accent-fg-color--transparent: rgba(34, 211, 238, 0.12);
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #f7f9fc;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0b1220;
+  --md-default-bg-color--light: #0e1626;
+  --md-default-bg-color--lighter: #111a2c;
+  --md-code-bg-color: #0e1626;
+}
+
+/* ---- Layout ------------------------------------------------------------- */
+
+.md-grid {
+  max-width: 76rem;
+}
+
+.md-header,
+.md-tabs {
+  background-color: #0b1220;
+}
+
+.md-header {
+  border-bottom: 1px solid rgba(34, 211, 238, 0.12);
+}
+
+.md-tabs {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.md-typeset {
+  font-size: 0.79rem;
+  line-height: 1.72;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  letter-spacing: -0.015em;
+}
+
+.md-typeset h1 {
+  color: var(--md-default-fg-color);
+  font-weight: 750;
+}
+
+.md-typeset h2 {
+  margin-top: 2.1em;
+  font-weight: 700;
+}
+
+.md-typeset h3 {
+  font-weight: 650;
+}
+
+.md-typeset a {
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
+}
+
+/* The landing page has no sidebar, so keep prose at a readable measure while
+   cards, diagrams, and code stay full width. */
+.md-content__inner:has(.hero) > p {
+  max-width: 48rem;
+}
+
+.md-typeset__table {
+  overflow-x: auto;
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 650;
+}
+
+.md-typeset pre > code {
+  font-size: 0.76rem;
+  line-height: 1.62;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 0.65rem;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--saphir-accent) 28%, transparent);
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+
+.md-content__inner:has(.hero) .md-content__button {
+  display: none;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 2.6rem;
+  align-items: center;
+  margin: 0.8rem 0 1.5rem;
+  padding: 2.9rem;
+  border: 1px solid var(--saphir-border);
+  border-radius: 1.1rem;
+  background:
+    radial-gradient(900px 340px at 8% -12%, var(--saphir-glow), transparent 65%),
+    radial-gradient(700px 320px at 112% 112%, color-mix(in srgb, var(--saphir-accent-2) 13%, transparent), transparent 62%),
+    var(--saphir-card-2);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--saphir-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--saphir-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at 28% 0%, #000 18%, transparent 74%);
+  -webkit-mask-image: radial-gradient(ellipse at 28% 0%, #000 18%, transparent 74%);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--saphir-muted);
+  font-size: 0.66rem;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.pulse {
+  display: inline-block;
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: var(--saphir-accent);
+  box-shadow: 0 0 0 0 var(--saphir-glow);
+  animation: saphir-pulse 2.6s ease-out infinite;
+}
+
+@keyframes saphir-pulse {
+  0% { box-shadow: 0 0 0 0 var(--saphir-glow); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.hero h1 {
+  margin: 0.55rem 0 0.95rem;
+  color: var(--md-default-fg-color);
+  font-size: clamp(2.05rem, 4.1vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.042em;
+}
+
+.hero h1 .grad {
+  background: linear-gradient(94deg, var(--saphir-accent), var(--saphir-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  max-width: 33rem;
+  margin: 0 0 0.4rem;
+  color: var(--saphir-muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.35rem 0 0.85rem;
+}
+
+.md-typeset .md-button {
+  padding: 0.52rem 1.05rem;
+  border-radius: 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  transition: transform 120ms ease, border-color 120ms ease, filter 120ms ease;
+}
+
+.md-typeset .md-button:active {
+  transform: translateY(1px);
+}
+
+.md-typeset .md-button--primary {
+  border: 0;
+  background: linear-gradient(135deg, var(--saphir-accent), var(--saphir-accent-2));
+  color: var(--saphir-accent-contrast);
+}
+
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:focus {
+  filter: brightness(1.07);
+  color: var(--saphir-accent-contrast);
+}
+
+.md-typeset .md-button--ghost {
+  border-color: var(--saphir-border);
+  background: transparent;
+  color: var(--saphir-muted);
+}
+
+.md-typeset .md-button--ghost:hover {
+  border-color: var(--saphir-accent);
+  color: var(--saphir-accent);
+}
+
+.arrow {
+  display: inline-block;
+  margin-left: 0.15rem;
+  transition: transform 140ms ease;
+}
+
+.md-button:hover .arrow {
+  transform: translateX(2px);
+}
+
+.hero-note {
+  margin: 0;
+  color: var(--saphir-muted);
+  font-size: 0.7rem;
+}
+
+/* ---- Terminal ----------------------------------------------------------- */
+
+.hero-terminal {
+  overflow: hidden;
+  border: 1px solid #1e293b;
+  border-radius: 0.9rem;
+  background: #070d18;
+  box-shadow: 0 28px 70px -30px rgba(2, 8, 20, 0.7);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.62rem 0.85rem;
+  border-bottom: 1px solid #16213a;
+  background: #0a1324;
+}
+
+.tdot {
+  display: inline-block;
+  width: 0.58rem;
+  height: 0.58rem;
+  border-radius: 50%;
+}
+
+.tdot.red { background: #f87171; }
+.tdot.amber { background: #fbbf24; }
+.tdot.green { background: #34d399; }
+
+.terminal-title {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.md-typeset .hero-terminal pre {
+  margin: 0;
+  padding: 1.05rem 1.15rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  line-height: 1.82;
+  overflow-x: auto;
+}
+
+.md-typeset .hero-terminal code {
+  background: transparent;
+  color: inherit;
+}
+
+.tok-key { color: #22d3ee; }
+.tok-ok { color: #34d399; }
+.tok-warn { color: #fbbf24; }
+.tok-dim { color: #64748b; }
+
+/* ---- Metrics ------------------------------------------------------------ */
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 1.35rem 0 0.35rem;
+  overflow: hidden;
+  border: 1px solid var(--saphir-border);
+  border-radius: 0.9rem;
+  background: var(--saphir-card);
+}
+
+.metric {
+  padding: 1.1rem 1.25rem;
+  border-right: 1px solid var(--saphir-border);
+}
+
+.metric:last-child {
+  border-right: 0;
+}
+
+.metric .value {
+  color: var(--saphir-accent);
+  font-size: 1.4rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.metric .label {
+  margin-top: 0.18rem;
+  color: var(--saphir-muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.metric-foot {
+  margin: 0.45rem 0 1.6rem;
+  color: var(--saphir-muted);
+  font-size: 0.68rem;
+}
+
+/* ---- Cards -------------------------------------------------------------- */
+
+.card-grid,
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.15rem 0 2rem;
+}
+
+.card,
+.doc-card {
+  border: 1px solid var(--saphir-border);
+  border-radius: 0.85rem;
+  background: var(--saphir-card);
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.card {
+  padding: 1.15rem 1.2rem;
+}
+
+.card:hover,
+.doc-card:hover {
+  border-color: color-mix(in srgb, var(--saphir-accent) 55%, var(--saphir-border));
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -24px rgba(2, 8, 20, 0.55);
+}
+
+.card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--saphir-accent) 12%, transparent);
+  color: var(--saphir-accent);
+}
+
+.card-icon svg {
+  width: 1.12rem;
+  height: 1.12rem;
+}
+
+.md-typeset .card h3 {
+  margin: 0.62rem 0 0.28rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.md-typeset .card p {
+  margin: 0;
+  color: var(--saphir-muted);
+  font-size: 0.75rem;
+  line-height: 1.64;
+}
+
+.doc-card {
+  display: block;
+  padding: 1.05rem 1.1rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.doc-card:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.doc-kicker {
+  color: var(--saphir-accent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.md-typeset .doc-card h3 {
+  margin: 0.22rem 0 0.28rem;
+  color: var(--md-default-fg-color);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.md-typeset .doc-card p {
+  margin: 0;
+  color: var(--saphir-muted);
+  font-size: 0.73rem;
+  line-height: 1.6;
+}
+
+/* ---- Citation ----------------------------------------------------------- */
+
+.cite-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 2rem 0 0.5rem;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--saphir-border);
+  border-radius: 0.9rem;
+  background: var(--saphir-card);
+}
+
+.md-typeset .cite-title {
+  margin: 0.2rem 0;
+  font-size: 0.82rem;
+}
+
+.md-typeset .cite-note {
+  margin: 0;
+  color: var(--saphir-muted);
+  font-size: 0.7rem;
+}
+
+/* ---- Static sequence diagram ------------------------------------------- */
+
+.seq {
+  position: relative;
+  margin: 1.4rem 0 1.6rem;
+  padding: 0 0 0.2rem;
+}
+
+.seq-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 0.55rem;
+}
+
+.seq-head span {
+  justify-self: center;
+  padding: 0.42rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--saphir-accent) 55%, var(--saphir-border));
+  border-radius: 0.45rem;
+  background: var(--saphir-card);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.seq-lifelines {
+  position: absolute;
+  top: 2.45rem;
+  bottom: 0.6rem;
+  left: 25%;
+  right: 25%;
+  border-left: 1px dashed var(--saphir-border);
+  border-right: 1px dashed var(--saphir-border);
+  pointer-events: none;
+}
+
+.seq-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 0.52rem 0;
+}
+
+.seq-row::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  right: 25%;
+  border-top: 1px solid color-mix(in srgb, var(--saphir-accent) 55%, transparent);
+}
+
+.seq-row::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 3.5px);
+  width: 0;
+  height: 0;
+  border-block: 3.5px solid transparent;
+}
+
+.seq-row.to-right::after {
+  right: calc(25% - 1px);
+  border-left: 5px solid var(--saphir-accent);
+}
+
+.seq-row.to-left::after {
+  left: calc(25% - 1px);
+  border-right: 5px solid var(--saphir-accent);
+}
+
+.seq-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.4rem;
+  max-width: 80%;
+  padding: 0.26rem 0.6rem;
+  border: 1px solid var(--saphir-border);
+  border-radius: 0.35rem;
+  background: var(--saphir-card);
+  font-size: 0.68rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.seq-label em {
+  color: var(--saphir-muted);
+  font-size: 0.64rem;
+  font-style: normal;
+  font-weight: 450;
+}
+
+.seq-note {
+  position: relative;
+  z-index: 1;
+  width: min(82%, 34rem);
+  margin: 0.6rem auto;
+  padding: 0.34rem 0.65rem;
+  border: 1px solid var(--saphir-border);
+  border-radius: 0.35rem;
+  background: var(--saphir-card-2);
+  color: var(--saphir-muted);
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.seq-note.accent {
+  border-color: color-mix(in srgb, var(--saphir-accent) 45%, var(--saphir-border));
+  background: color-mix(in srgb, var(--saphir-accent) 8%, var(--saphir-card));
+  color: var(--saphir-accent);
+  font-weight: 600;
+}
+
+/* Keep the header repo link but drop the empty star/fork counters. */
+.md-source__facts {
+  display: none;
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+
+@media screen and (max-width: 76.25em) {
+  .hero {
+    padding: 2.3rem;
+    gap: 1.8rem;
+  }
+}
+
+@media screen and (max-width: 60em) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.6rem;
+  }
+
+  .hero-terminal {
+    max-width: 34rem;
+  }
+
+  .card-grid,
+  .docs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+
+  .metric:nth-child(-n+2) {
+    border-bottom: 1px solid var(--saphir-border);
+  }
+}
+
+@media screen and (max-width: 40em) {
+  .hero {
+    padding: 1.6rem 1.2rem;
+    border-radius: 0.9rem;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .eyebrow-extra {
+    display: none;
+  }
+
+  .cta-row .md-button--primary {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .card-grid,
+  .docs-grid,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--saphir-border);
+  }
+
+  .metric:last-child {
+    border-bottom: 0;
+  }
+
+  .cite-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .md-typeset .hero-terminal pre {
+    font-size: 0.62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+
+  .card,
+  .doc-card,
+  .md-button,
+  .arrow {
+    transition: none;
+  }
+}

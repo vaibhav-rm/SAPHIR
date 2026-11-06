@@ -1,6 +1,6 @@
 # Reproducibility appendix
 
-Artifact: \url{https://github.com/vaibhav-rm/SAPHIR} (MIT, research prototype).
+Artifact: [github.com/vaibhav-rm/SAPHIR](https://github.com/vaibhav-rm/SAPHIR) (MIT, research prototype).
 
 ## Environment
 - Python 3.14, `pip install -r requirements.txt` (`cbor2`, `cryptography`, `pytest`).
@@ -11,7 +11,7 @@ Artifact: \url{https://github.com/vaibhav-rm/SAPHIR} (MIT, research prototype).
 ## Commands (run from repo root)
 | Claim | Command |
 |---|---|
-| Unit tests (11) | `PYTHONPATH=src:evals python -m pytest tests/ -q` |
+| Unit tests (60) | `PYTHONPATH=src python -m pytest tests/ -q` |
 | 3-act demo + audit log | `PYTHONPATH=src python demo/demo_cli.py` (writes `logs/demo.jsonl`) |
 | Cost/goodput bench | `PYTHONPATH=src python evals/bench.py` |
 | Attack matrix | `PYTHONPATH=src python evals/attacks.py` (exit nonzero on failure) |
@@ -24,6 +24,8 @@ Artifact: \url{https://github.com/vaibhav-rm/SAPHIR} (MIT, research prototype).
 | CPU profiling | `PYTHONPATH=src python evals/perf.py` |
 | AI dialogue (mock, no model) | `PYTHONPATH=src python demo/ai_dialogue.py --backend mock` |
 | AI dialogue (real, needs Ollama) | `PYTHONPATH=src python demo/ai_dialogue.py --backend ollama` |
+| Local-AI harness demo | `PYTHONPATH=src python -m saphir.harness demo` |
+| Local-AI harness tests | `PYTHONPATH=src python -m pytest tests/test_harness.py -q` |
 | Amortization + figure | `PYTHONPATH=src python evals/amortization.py` (writes `evals/amortization.csv`, `paper/figures/amortization.png`) |
 | Blue Sky draft | `cd paper/bluesky && pdflatex main.tex` (twice) |
 | Journal manuscript | `cd paper/journal && pdflatex main.tex` (twice) |
