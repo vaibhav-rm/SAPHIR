@@ -21,7 +21,7 @@ Ephemeral is the safe default: rotating DIDs leak nothing across pairings.
 - Does NOT give: first-contact authentication. A stable-looking DID string is
   self-asserted — our `evals/mitm.py` demonstrates the break. Real
   authentication needs PKI-bound DIDs (verifiable credentials where IP
-  exists), which is tracked as the top future item in `docs/publication-plan.md`.
+  exists); this is tracked as a top future item.
 
 ## Production checklist (all open)
 

@@ -94,7 +94,7 @@ trades wall-clock time for near-zero neural compute. See
 
 Identity. The protocol authenticates *the session*, not *the peer's name*. The
 second biggest is evidence: no real-room measurements yet. Both are stated in
-the paper and the repository rather than buried.
+the repository rather than buried.
 
 ## Can I use it in production?
 
@@ -102,11 +102,6 @@ No. It is a research prototype, not audited, with no PKI and no group support.
 Use it for research, demos, and red-teaming. The MIT license permits reuse, but
 the security claims are scoped to what is written in
 [Evaluation](EVALUATION.md).
-
-## How do I cite it?
-
-See [Status & roadmap](STATUS.md#citation) or use
-[`CITATION.cff`](https://github.com/vaibhav-rm/SAPHIR/blob/main/CITATION.cff).
 
 ## How do I report a problem?
 

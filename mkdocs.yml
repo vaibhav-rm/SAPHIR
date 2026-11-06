@@ -85,6 +85,7 @@ plugins:
 exclude_docs: |
   paper-outline.md
   publication-plan.md
+  NOVELTY.md
 
 nav:
   - Home: index.md
@@ -98,7 +99,6 @@ nav:
       - Identity: IDENTITY.md
   - Security:
       - Evaluation & threat model: EVALUATION.md
-      - Novelty & prior art: NOVELTY.md
   - Local-AI harness: HARNESS.md
   - Project:
       - Status & roadmap: STATUS.md

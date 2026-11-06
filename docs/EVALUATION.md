@@ -29,7 +29,7 @@ byte count. Byte-compaction for tasks has landed (all task frames single-frame,
 117--139 B); every frame including handshake (~115--128 B) fits one transmission.
 
 Model assumptions live in `src/saphir/metrics.py` (prices, 4 chars/token,
-32 Bps audible-fast goodput). Tune and cite before submitting.
+32 Bps audible-fast goodput). Tune before reuse.
 
 CPU cost (measured, `evals/perf.py`, N=200): ephemeral keypair 0.06ms, full
 4-message handshake 0.22ms, seal 0.008ms, open 0.02ms, bloom build+query
@@ -104,8 +104,8 @@ for other ggwave profiles; bytes are the hard numbers.
 | 8 | 432 | 2431 | 0.0107 | 0.00016 | 40.2 | 79.2 |
 | 20 | 1080 | 5383 | 0.0266 | 0.00040 | 100.4 | 176.2 |
 
-Reading for the paper: **cost breakeven is immediate and grows (~65× at 20
-turns)** — that, plus determinism and security, is the claimed win.
+Cost breakeven is immediate and grows (~65× at 20 turns) — that, plus
+determinism and security, is the claimed win.
 **Wall-clock is deliberately not claimed**: narrowband audio moves fewer
 bytes/sec than speech, so SAPHIR trades time for near-zero neural compute.
 Wire bytes stay above raw-text-over-tones (structure + auth tags cost);
@@ -119,8 +119,7 @@ Repro: `PYTHONPATH=src python evals/amortization.py` (writes CSV + figure).
 
 `BurstChannel` (Gilbert-Elliott two-state bursts) + named `PROFILES`, full task
 over ARQ. These are illustrative loss models, **not** waveform simulation —
-over-air measurement across real codecs (PCM/Opus/G.711) remains future work,
-and the manuscript must say so.
+over-air measurement across real codecs (PCM/Opus/G.711) remains future work.
 
 | profile | success | rate | median ticks | median wire B | median retries |
 |---|---|---|---|---|---|
@@ -141,7 +140,7 @@ same seal/open/handle path with a non-default ontology tag (`st1`) and
 domain-specific value shorts. All four task frames across both domains fit the
 single-frame budget (117/131/128/139 B). Test: `tests/test_domains.py`.
 Dictionary coding is demo-scale by design; schema-driven dictionaries
-negotiated in HELLO are the scalable version (manuscript RQ).
+negotiated in HELLO are the scalable version.
 
 ## 9. Decoder characterization (negative result, `evals/decoder_fragility.py`)
 

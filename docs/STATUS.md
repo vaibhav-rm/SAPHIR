@@ -17,13 +17,11 @@ audited, not standardized, and not ready for production deployment.
 | Over-air ggwave path | Complete demo | `demo/web/` |
 | Local-AI harness | Complete | [Harness](HARNESS.md), 18 tests |
 | Evaluation harnesses | Complete (9) | [Evaluation](EVALUATION.md) |
-| Manuscript draft | Complete draft | `paper/journal/main.tex` |
 | Real-room measurements | **Open** | needs hardware and time |
 | PKI-backed identity | **Open** | break demonstrated in `evals/mitm.py` |
 | Group sessions (MLS) | **Open** | design work |
 | Schema-driven capability dictionaries | **Open** | research question |
 | Third-party security audit | **Open** | external |
-| arXiv + journal submission | **Open** | author action |
 
 ## Completed milestones
 
@@ -38,7 +36,6 @@ audited, not standardized, and not ready for production deployment.
 - [x] Impostor-responder break documented to pin the PKI gap
 - [x] CPU cost profiling (handshake 0.22 ms; seal/open tens of microseconds)
 - [x] Local-AI harness for Ollama, OpenAI-compatible, and prompt-only models
-- [x] Six-page JAAMAS manuscript draft + Blue Sky sketch
 
 ## Open work, honestly stated
 
@@ -56,8 +53,6 @@ research, or an author action:
 5. **Selective disclosure.** The sidecar is all-or-nothing today; metadata
    leakage is a known concern.
 6. **External audit.** No third party has reviewed the protocol or code.
-7. **Publication.** arXiv upload and journal submission require the author's
-   accounts and decisions. See `docs/publication-plan.md` in the repository.
 
 ## Compatibility
 
@@ -69,20 +64,3 @@ research, or an author action:
 | Optional | `ggwave` (real acoustic codec) |
 | Harness backends | Ollama, OpenAI-compatible, prompted JSON |
 | License | MIT |
-
-## Citation
-
-If you use SAPHIR in academic work, cite:
-
-```bibtex
-@software{rathod2026saphir,
-  author  = {Rathod, Vaibhav Vishwas Ram},
-  title   = {SAPHIR: Secure Acoustic Pairing for Heterogeneous Inter-agent Rendezvous},
-  year    = {2026},
-  url     = {https://github.com/vaibhav-rm/SAPHIR},
-  note    = {Research prototype, MIT license}
-}
-```
-
-Machine-readable metadata lives in
-[`CITATION.cff`](https://github.com/vaibhav-rm/SAPHIR/blob/main/CITATION.cff).

@@ -4,7 +4,7 @@ Artifact: [github.com/vaibhav-rm/SAPHIR](https://github.com/vaibhav-rm/SAPHIR) (
 
 ## Environment
 - Python 3.14, `pip install -r requirements.txt` (`cbor2`, `cryptography`, `pytest`).
-- LaTeX (TeX Live) only needed for `paper/`; `matplotlib` only for the amortization figure.
+- `matplotlib` only for the amortization figure.
 - No audio hardware, no API keys, no network needed. All channels are in-process
   byte pipes; `channel.try_ggwave_roundtrip()` degrades gracefully without `ggwave`.
 
@@ -26,9 +26,7 @@ Artifact: [github.com/vaibhav-rm/SAPHIR](https://github.com/vaibhav-rm/SAPHIR) (
 | AI dialogue (real, needs Ollama) | `PYTHONPATH=src python demo/ai_dialogue.py --backend ollama` |
 | Local-AI harness demo | `PYTHONPATH=src python -m saphir.harness demo` |
 | Local-AI harness tests | `PYTHONPATH=src python -m pytest tests/test_harness.py -q` |
-| Amortization + figure | `PYTHONPATH=src python evals/amortization.py` (writes `evals/amortization.csv`, `paper/figures/amortization.png`) |
-| Blue Sky draft | `cd paper/bluesky && pdflatex main.tex` (twice) |
-| Journal manuscript | `cd paper/journal && pdflatex main.tex` (twice) |
+| Amortization + figure | `PYTHONPATH=src python evals/amortization.py` (writes `evals/amortization.csv`, figure) |
 
 ## Seeds and determinism
 - `robustness.py`: 50 trials/cell, channel seeds `1000+i`.

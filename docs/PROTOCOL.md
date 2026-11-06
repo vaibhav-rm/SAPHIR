@@ -35,7 +35,7 @@ Single-frame throughout: handshake compaction (dropped duplicate id/nonce,
 int codebooks, short DIDs, int timestamps) brought HELLO/WELCOME under the
 140B budget alongside tasks. Hand dictionaries are demo-scale by design;
 schema-driven dictionaries negotiated in HELLO are the scalable version
-(future work, listed as an RQ in the manuscript).
+(future work).
 
 ## Security properties (MVP)
 
