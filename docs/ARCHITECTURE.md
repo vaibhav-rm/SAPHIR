@@ -44,4 +44,4 @@
 
 `demo/demo_cli.py`: builds two sessions + two channels, pumps frames through
 `encode → channel → decode → handle`, drives the hotel booking (check then book),
-then runs Act 3 (forgery + replay attacks). Every step calls `audit.record()`.
+then runs Act 3 (forgery + replay attacks). Every step calls ..
