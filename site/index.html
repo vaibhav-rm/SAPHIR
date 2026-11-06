@@ -96,6 +96,27 @@ PYTHONPATH=src python evals/attacks.py
 PYTHONPATH=src python evals/robustness.py</pre>
 </section>
 
+<section id="harness">
+  <h2>Harness for local models</h2>
+  <p>SAPHIR now ships a harness that attaches the protocol to <strong>any local AI</strong>:
+  Ollama, llama.cpp, LM Studio, vLLM, or a prompt-only model. The model gets six tools
+  (<code>pair</code>, <code>send_task</code>, <code>serve</code>, <code>status</code>,
+  <code>audit</code>, <code>close</code>); the harness owns the session, the capability
+  allow-list, the 200B size guard, and the audit sidecar.</p>
+<pre>PYTHONPATH=src python -m saphir.harness demo     # no model, no hardware
+
+# service side
+PYTHONPATH=src python -m saphir.harness serve --agent hotel-bot \
+  --offers hotel.check,hotel.book --handler hotel --listen 127.0.0.1:9001
+
+# local model books over SAPHIR
+PYTHONPATH=src python -m saphir.harness agent --agent caller-ai \
+  --need hotel.book --goal "Book a double room for 2026-11-02" \
+  --backend ollama --model qwen2.5:1.5b --connect 127.0.0.1:9001</pre>
+  <p>Integration APIs and guardrails: <a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/HARNESS.md">docs/HARNESS.md</a>.
+  Novelty and prior-art assessment: <a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/NOVELTY.md">docs/NOVELTY.md</a>.</p>
+</section>
+
 <section id="docs">
   <h2>Docs</h2>
   <ul>
@@ -103,6 +124,8 @@ PYTHONPATH=src python evals/robustness.py</pre>
     <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/ARCHITECTURE.md">Module design (ARCHITECTURE.md)</a></li>
     <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/EVALUATION.md">Numbers + threat model (EVALUATION.md)</a></li>
     <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/REPRODUCIBILITY.md">Reproducibility guide</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/HARNESS.md">Local-AI harness guide</a></li>
+    <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/NOVELTY.md">Novelty &amp; prior-art assessment</a></li>
     <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/docs/IDENTITY.md">Identity / DID notes</a></li>
     <li><a href="https://github.com/vaibhav-rm/SAPHIR/blob/main/demo/web/README.md">Web demo guide</a></li>
   </ul>

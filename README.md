@@ -65,6 +65,26 @@ opening, then pair and book over SAPHIR (`--backend mock` needs nothing):
 PYTHONPATH=src python demo/ai_dialogue.py --backend ollama
 ```
 
+**Local-AI harness** — attach SAPHIR to *any* local model (Ollama, llama.cpp,
+LM Studio, vLLM, or a prompt-only model). The model sees six tools; the harness
+owns the session, capability allow-list, and audit sidecar:
+
+```bash
+PYTHONPATH=src python -m saphir.harness demo          # no model, no hardware
+
+# terminal 1: service side
+PYTHONPATH=src python -m saphir.harness serve --agent hotel-bot \
+  --offers hotel.check,hotel.book --handler hotel --listen 127.0.0.1:9001
+
+# terminal 2: a local model books over SAPHIR
+PYTHONPATH=src python -m saphir.harness agent --agent caller-ai \
+  --need hotel.book --goal "Book a double room for 2026-11-02" \
+  --backend ollama --model qwen2.5:1.5b --connect 127.0.0.1:9001
+```
+
+Details, integration APIs, and guardrails: [`docs/HARNESS.md`](docs/HARNESS.md).
+Novelty/prior-art assessment: [`docs/NOVELTY.md`](docs/NOVELTY.md).
+
 ```bash
 # tests / benchmark / attacks / robustness sweep
 PYTHONPATH=src python -m pytest tests/ -q
@@ -129,14 +149,22 @@ src/saphir/
   session.py    handshake state machine + AEAD messaging
   crypto.py     X25519 + HKDF + ChaCha20Poly1305
   channel.py    InMemory / Lossy(drop+corrupt) / ggwave probe
+  guard.py      HELLO freshness + per-sender rate limiting
   agents.py     hotel-booking toy task (English vs structured)
   audit.py      JSONL sidecar log + human transcript
   metrics.py    cost/latency model (assumptions documented)
+  harness/      attach any local AI to SAPHIR:
+    core.py       session + transport + allow-list + audit endpoint
+    tools.py      six model-facing tools (pair/send/serve/status/audit/close)
+    backends.py   Ollama / OpenAI-compatible / prompt-only / scripted
+    agent.py      bounded tool-calling loop
+    transport.py  loopback / shared-dir / TCP
+    cli.py        python -m saphir.harness demo|serve|agent
 demo/demo_cli.py   3-act demo (no audio HW required)
 evals/bench.py     goodput + cost comparison
 evals/attacks.py   replay / forgery / downgrade checks
 tests/             pytest suite
-docs/              PROTOCOL / ARCHITECTURE / EVALUATION
+docs/              PROTOCOL / ARCHITECTURE / EVALUATION / HARNESS / NOVELTY
 ```
 
 ## Roadmap
@@ -154,6 +182,10 @@ docs/              PROTOCOL / ARCHITECTURE / EVALUATION
 - [x] Future, completed: real ggwave-over-air path (vendored WASM, live mic
   decode, in-process roundtrips), compact slot/value encoding (all frames
   single-frame), capability discovery, resumption, AI-agent integration.
+- [x] Local-AI harness: any Ollama / OpenAI-compatible / prompt-only model can
+  pair and exchange tasks through six tools, with capability allow-lists,
+  size guards, and a JSONL audit sidecar (`docs/HARNESS.md`). Prior-art and
+  reviewer-risk assessment in `docs/NOVELTY.md`.
 - [ ] Future, genuinely open (need hardware / new research / you):
   real-room measurements, DID PKI (break demonstrated in `evals/mitm.py`),
   MLS groups, schema-driven capability dictionaries, sidecar selective
